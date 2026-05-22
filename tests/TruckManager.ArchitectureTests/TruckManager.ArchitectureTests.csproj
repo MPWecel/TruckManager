@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="xunit.v3" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="AwesomeAssertions" />
+        <PackageReference Include="NetArchTest.Rules" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\TruckManager.Common\TruckManager.Common.csproj" />
+        <ProjectReference Include="..\..\src\TruckManager.Domain\TruckManager.Domain.csproj" />
+        <ProjectReference Include="..\..\src\TruckManager.Application\TruckManager.Application.csproj" />
+        <ProjectReference Include="..\..\src\TruckManager.Infrastructure\TruckManager.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\src\TruckManager.Api\TruckManager.Api.csproj" />
+    </ItemGroup>
+
+</Project>

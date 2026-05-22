@@ -1,0 +1,37 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: truckmanager-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-truckmanager}
+      POSTGRES_USER: ${POSTGRES_USER:-truckmanager}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-truckmanager}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-truckmanager} -d ${POSTGRES_DB:-truckmanager}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+
+  api:
+    image: truckmanager-api:local
+    container_name: truckmanager-api
+    build:
+      # Context is the source-tree root so the Dockerfile can COPY global.json + Directory.*.props.
+      context: ..
+      dockerfile: src/TruckManager.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-truckmanager};Username=${POSTGRES_USER:-truckmanager};Password=${POSTGRES_PASSWORD:-truckmanager}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+    name: truckmanager-pgdata

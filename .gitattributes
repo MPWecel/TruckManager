@@ -1,0 +1,24 @@
+# Default: let git auto-detect text/binary and normalize line endings.
+* text=auto
+
+# Force LF for files consumed by Linux containers / shell tools, regardless of host OS.
+*.sh        text eol=lf
+Dockerfile  text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+
+# Force CRLF for files that are exclusively Windows-tooled.
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+*.ps1       text eol=crlf
+
+# Binary — never normalize.
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.pdf       binary
+*.zip       binary
+*.snk       binary
+*.pfx       binary

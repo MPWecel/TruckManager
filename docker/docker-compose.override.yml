@@ -1,0 +1,19 @@
+# Local-dev overlay. Auto-merged by `docker compose` when both files are passed via -f,
+# or when compose is invoked from this directory.
+
+services:
+
+  postgres:
+    ports:
+      # Host:Container. Expose Postgres so EF Core migrations + DB tools can reach it from the host.
+      - "5432:5432"
+
+  api:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      # TODO (Phase 7): Serilog override levels via env vars. Category names contain
+      # dots (e.g. Microsoft.Hosting.Lifetime), so use the LIST form of `environment:`
+      # or quoted keys — `__` is the section separator, dots stay literal.
+    ports:
+      # Host:Container. Container listens on 8080 (set by the aspnet:9.0 base image).
+      - "5000:8080"

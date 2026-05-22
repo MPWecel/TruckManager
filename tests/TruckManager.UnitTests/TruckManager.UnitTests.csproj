@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="xunit.v3" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="AwesomeAssertions" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\TruckManager.Common\TruckManager.Common.csproj" />
+        <ProjectReference Include="..\..\src\TruckManager.Domain\TruckManager.Domain.csproj" />
+        <ProjectReference Include="..\..\src\TruckManager.Application\TruckManager.Application.csproj" />
+    </ItemGroup>
+
+</Project>
