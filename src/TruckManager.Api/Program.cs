@@ -14,7 +14,8 @@ if (application.Environment.IsDevelopment())
     application.MapOpenApi();
 }
 
-application.UseHttpsRedirection();
+// HTTPS redirection intentionally omitted: Phase 1 local stack runs HTTP-only inside Docker (port 8080).
+// Add `application.UseHttpsRedirection()` back when a real TLS termination point exists.
 
 application.UseAuthorization();
 
