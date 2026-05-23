@@ -25,7 +25,7 @@ public sealed record TruckCode
         Error? failure = Rules.Select(rule => rule(normalized))
                               .FirstOrDefault(e => e is not null);
         
-        bool isSuccess = failure is not null;
+        bool isSuccess = failure is null;
         Result<TruckCode> result = isSuccess ? Result<TruckCode>.Success(new TruckCode(normalized)) : Result<TruckCode>.Failure(failure!);
         return result;
 
@@ -41,6 +41,6 @@ public sealed record TruckCode
 
     private static bool IsStringLengthOverLimit(string value) => value.Length > MaxLength;
     private static bool IsValidCharset(string value) => value.All(IsCharacterUpperAlphaNumeric);
-    private static bool IsCharacterUpperAlphaNumeric(char character) => Char.IsAsciiLetterOrDigit(character) || Char.IsAsciiLetterUpper(character);
+    private static bool IsCharacterUpperAlphaNumeric(char character) => Char.IsAsciiDigit(character) || Char.IsAsciiLetterUpper(character);
 
 }

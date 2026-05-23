@@ -23,7 +23,7 @@ public sealed record TruckName
                               .FirstOrDefault(e => e is not null);
 
         bool isSuccess = failure is null;
-        Result<TruckName> result = isSuccess ? Result<TruckName>.Success(new TruckName(trimmed)) : Result<TruckName>.Failure(failure!)
+        Result<TruckName> result = isSuccess ? Result<TruckName>.Success(new TruckName(trimmed)) : Result<TruckName>.Failure(failure!);
             return result;
 
         //return failure is null ? new TruckName(trimmed) : failure;    //TODO I don't like it.
