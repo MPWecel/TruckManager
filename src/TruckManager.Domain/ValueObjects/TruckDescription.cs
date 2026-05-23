@@ -23,7 +23,6 @@ public sealed record TruckDescription
 
     public static Result<TruckDescription> Create(string? raw)
     {   
-        //TODO I don't like early returns. To consider when refactoring: Single exit point with default value when condition not met. Might produce ugly code, tho. Food for thought...
         if (raw is null)
             return Empty;
         
@@ -38,8 +37,6 @@ public sealed record TruckDescription
         bool isSuccess = failure is null;
         Result<TruckDescription> result = isSuccess ? Result<TruckDescription>.Success(new TruckDescription(trimmed)) : Result<TruckDescription>.Failure(failure!);
         return result;
-
-        //return failure is null ? new TruckDescription(trimmed) : failure; //TODO I don't like it.
     }
 
     private static readonly Func<string, Error?>[] Rules =
@@ -49,5 +46,5 @@ public sealed record TruckDescription
     ];
 
     private static bool IsStringLengthOverLimit(string value) => value.Length > MaxLength;
-    private static bool HasControlChars(string value) => value.Any(char.IsControl);
+    private static bool HasControlChars(string value) => value.Any(Char.IsControl);
 }

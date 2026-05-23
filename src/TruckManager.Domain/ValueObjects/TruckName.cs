@@ -18,15 +18,12 @@ public sealed record TruckName
         ArgumentNullException.ThrowIfNull(raw);
 
         string trimmed = raw.Trim();
-
         Error? failure = Rules.Select(rule => rule(trimmed))
                               .FirstOrDefault(e => e is not null);
 
         bool isSuccess = failure is null;
         Result<TruckName> result = isSuccess ? Result<TruckName>.Success(new TruckName(trimmed)) : Result<TruckName>.Failure(failure!);
-            return result;
-
-        //return failure is null ? new TruckName(trimmed) : failure;    //TODO I don't like it.
+        return result;
     }
 
     private static readonly Func<string, Error?>[] Rules =

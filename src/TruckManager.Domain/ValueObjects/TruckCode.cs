@@ -28,8 +28,6 @@ public sealed record TruckCode
         bool isSuccess = failure is null;
         Result<TruckCode> result = isSuccess ? Result<TruckCode>.Success(new TruckCode(normalized)) : Result<TruckCode>.Failure(failure!);
         return result;
-
-        //return failure is null ? new TruckCode(normalized) : failure;   //TODO I don't like it
     }
 
     private static readonly Func<string, Error?>[] Rules =
