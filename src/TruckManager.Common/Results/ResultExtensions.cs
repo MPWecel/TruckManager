@@ -34,14 +34,18 @@ public static class ResultExtensions
 
     public static Result Combine(params Result[] results)
     {
-        //List<Error> errs = results.Where(r => r.IsFailure).SelectMany(r=>r.Errors).ToList() ?? new(); //TODO verify if the same.
+        //  List<Error> errs = results.Where(r => r.IsFailure)
+        //                            .Where(r=>r.Errors is not null)
+        //                            .SelectMany(r=>r.Errors)
+        //                            .ToList() ?? new(); //TODO verify if the same. [v]DONE - the same
         List<Error> errors = new();
         foreach(var result in results)
         {
             if (result.IsFailure)
                 errors.AddRange(result.Errors);
         }
-        Result finalResult = errors.Any() ? Result.Success() : Result.Failure(errors);
+
+        Result finalResult = !errors.Any() ? Result.Success() : Result.Failure(errors);
 
         return finalResult;
     }
