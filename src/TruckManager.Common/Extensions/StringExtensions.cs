@@ -6,7 +6,10 @@ public static class StringExtensions
     // Potential to extend if rules for TruckCode format are estabilished
     public static string NormalizeCode(this string value)
     {
-        ArgumentNullException.ThrowIfNullOrEmpty(value);    //Cool .NET9 feature for guarding. Downside - blocks using function body. Alternative is buttfugly, this is lesser of two evulz.
+        // Null is an invariant violation (caller bug).
+        // Empty / whitespace are valid inputs for the utility — they normalize to "" and the *caller's* domain rules decide whether emptiness is acceptable
+        // (e.g. TruckCode.Create flags it as Validation failure via its Rules pipeline). See ADR-0028.
+        ArgumentNullException.ThrowIfNull(value);
         return value.Trim().ToUpperInvariant();
     }
 }
