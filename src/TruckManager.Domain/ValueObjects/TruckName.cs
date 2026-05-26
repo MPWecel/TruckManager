@@ -13,6 +13,15 @@ public sealed record TruckName
 
     private TruckName(string value) => Value = value;
 
+    // [Phase 4 — Persistence]   Fast-path for DB-sourced strings that were validated by
+    // Create(...) on insert. Used by the EF Core value converter on load. Do NOT use for
+    // any input originating outside the persistence boundary — call Create(...) instead.
+    internal static TruckName FromTrusted(string value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return new TruckName(value);
+    }
+
     public static Result<TruckName> Create(string raw)
     {
         ArgumentNullException.ThrowIfNull(raw);

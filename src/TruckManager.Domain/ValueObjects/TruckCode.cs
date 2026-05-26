@@ -15,6 +15,15 @@ public sealed record TruckCode
 
     private TruckCode(string value) => Value = value;
 
+    // [Phase 4 — Persistence]   Fast-path for DB-sourced strings that were validated by
+    // Create(...) on insert. Used by the EF Core value converter on load. Do NOT use for
+    // any input originating outside the persistence boundary — call Create(...) instead.
+    internal static TruckCode FromTrusted(string value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return new TruckCode(value);
+    }
+
     public static Result<TruckCode> Create(string raw)
     {
         // null is an invariant violation per ADR-0028 — well-behaved callers normalize at

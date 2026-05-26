@@ -21,6 +21,16 @@ public sealed record TruckDescription
 
     private TruckDescription(string value) => Value = value;
 
+    // [ADR-0032 follow-up / Phase 4 decision #2]   Fast-path for DB-sourced strings that
+    // have already been validated by Create(...) on insert. Used by the EF Core value
+    // converter on load to skip the validator pipeline. Do NOT use for any input
+    // originating outside the persistence boundary — call Create(...) instead.
+    internal static TruckDescription FromTrusted(string value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return value.Length == 0 ? Empty : new TruckDescription(value);
+    }
+
     public static Result<TruckDescription> Create(string? raw)
     {   
         if (raw is null)

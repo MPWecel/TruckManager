@@ -42,6 +42,16 @@ public sealed class Truck : AggregateRoot<TruckId>
         Status = status;
     }
 
+    // EF Core materialization constructor — see Domain/Common/BaseEntity.cs. NEVER invoke
+    // from Domain code; the factory Create(...) is the only public construction path.
+    private Truck() : base()
+    {
+        Code        = default!;
+        Name        = default!;
+        Description = default!;
+        Status      = default;
+    }
+
     // ----------------------------------------------------------------------------------
     // Factory
     // ----------------------------------------------------------------------------------
