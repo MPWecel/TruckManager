@@ -2,6 +2,11 @@
 
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+        <!-- Forces transitive references to honour the pinned versions below. Resolves
+             the EF Core 9.0.1 vs 9.0.16 MSB3277 we hit after adding the Design package
+             to the Api project (a transitive of one of the test packages pulled the
+             older 9.0.1 line). -->
+        <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     </PropertyGroup>
 
     <!-- Microsoft / ASP.NET Core 9 -->
@@ -12,8 +17,32 @@
 
     <!-- EF Core 9 + Npgsql -->
     <ItemGroup>
+        <!-- Pinned explicitly so CentralPackageTransitivePinningEnabled (above) forces
+             any transitive reference to resolve to 9.0.16. Without this entry, transitive
+             pinning had nothing to pin against and the warning persisted. -->
+        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.16" />
         <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.16" />
         <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    </ItemGroup>
+
+    <!-- Diagnostics / health checks + hosted services (Section D) -->
+    <ItemGroup>
+        <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="9.0.16" />
+        <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.16" />
+    </ItemGroup>
+
+    <!-- DI + configuration + hosting (Section F) -->
+    <ItemGroup>
+        <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.16" />
+        <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.16" />
+        <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.16" />
+    </ItemGroup>
+
+    <!-- Section G integration tests — building the production DI graph against Testcontainers Postgres.
+         The InMemory configuration provider lives inside Microsoft.Extensions.Configuration (not a
+         separate ".Memory" package — that NuGet id does not exist). -->
+    <ItemGroup>
+        <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.16" />
     </ItemGroup>
 
     <!-- Validation -->
