@@ -22,4 +22,14 @@ public abstract class BaseEntity<TId> where TId : IStronglyTypedId<Guid>
         TenantId = tenantId;
         ConcurrencyStamp = concurrencyStamp;
     }
+
+    // EF Core materialization constructor — NEVER invoke from Domain code. EF reaches it
+    // via reflection during load and immediately populates each property via its setter,
+    // so the transient null state never escapes the materializer.
+    protected BaseEntity()
+    {
+        Id               = default!;
+        TenantId         = default!;
+        ConcurrencyStamp = default!;
+    }
 }

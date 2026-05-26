@@ -4,6 +4,13 @@
         <ProjectReference Include="..\TruckManager.Common\TruckManager.Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- Phase 4: lets the EF Core value converters call internal FromTrusted helpers on
+             VOs (TruckCode/Name/Description) at the persistence boundary, without exposing
+             validation bypass to Application or Api. -->
+        <InternalsVisibleTo Include="TruckManager.Infrastructure" />
+    </ItemGroup>
+
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
