@@ -6,9 +6,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!-- Phase 5: handler/dispatcher DI, validator assembly scanning. -->
+        <!-- Phase 5 / Section A: handler/dispatcher DI, validator assembly scanning. -->
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+        <!-- Phase 5 / Section B: IApplicationDbContext uses DbSet<T> [ADR-0040]. -->
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
     </ItemGroup>
 
     <PropertyGroup>
