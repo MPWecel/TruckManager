@@ -1,6 +1,7 @@
 namespace TruckManager.Common.Results;
 
-public class Result
+// [ADR-0039]   Implements IResult so pipeline behaviors can read IsSuccess uniformly across Result and Result<T>.
+public class Result : IResult
 {
     public bool IsSuccess { get; }
     public bool IsFailure => !IsSuccess;
@@ -15,14 +16,13 @@ public class Result
         if (IsInvalid_FailureWithoutErrors(isSuccess, errors.Count))
             throw new ArgumentException("A failed Result must carry at least one error.", nameof(errors));
         
-
         IsSuccess = isSuccess;
         Errors = errors;
     }
 
-    public static Result Success() => new(true, new List<Error>());
+    public static Result Success() => new(true, new List<Error>(1));
     public static Result Failure(Error error) => new(false, [error]);
-    public static Result Failure(IEnumerable<Error> errors) => new(false, [.. errors]);
+    public static Result Failure(IEnumerable<Error> errors) => new(false, errors.ToList());
 
     // implicit cast to allow returning error directly
     public static implicit operator Result(Error error) => Result.Failure(error);
@@ -31,7 +31,7 @@ public class Result
     private static bool IsInvalid_FailureWithoutErrors(bool isSuccess, int errorCount) => !isSuccess && errorCount <= 0;
 }
 
-public sealed class Result<T> : Result
+public sealed class Result<T> : Result, IResult
 {
     public T? Value { get; }
 
@@ -40,9 +40,9 @@ public sealed class Result<T> : Result
         Value = value;
     }
 
-    public static Result<T> Success(T value) => new(true, value, new List<Error>());
+    public static Result<T> Success(T value) => new(true, value, new List<Error>(1));
     public static new Result<T> Failure(Error error) => new(false, default, [error]);
-    public static new Result<T> Failure(IEnumerable<Error> errors) => new(false, default, [.. errors]);
+    public static new Result<T> Failure(IEnumerable<Error> errors) => new(false, default, errors.ToList());
     
     // implicit casting to allow returning values or errors directly
     public static implicit operator Result<T>(T value) => Result<T>.Success(value);
