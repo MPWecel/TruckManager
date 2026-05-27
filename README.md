@@ -5,9 +5,9 @@ A demo module of an ERP platform - first vertical slice contains a REST API for 
 The TruckManager module is an architectural template for potential future modules.
 
 >   **Implementation Status:** 
-        Phase 1 (Solution Skeleton) in progress. 
-        The source tree is being scaffolded. 
-        Commands marked **(planned)** below will work once Phase 1 is complete — see roadmap in design document.
+        Phases 1–5 complete (Solution Skeleton, Shared Kernel, Domain, Persistence, CQRS). 
+        Phase 6 (API Layer) starting — REST controllers, ProblemDetails, OpenAPI/Swagger land here. 
+        See [`.claude/docs/phases.md`](../.claude/docs/phases.md) for the full roadmap.
 
 ---
 
@@ -37,8 +37,8 @@ Full architecture and Architectural Decision Log in design document.
         │   ├── TruckManager.Application/
         │   ├── TruckManager.Infrastructure/
         │   ├── TruckManager.Api/
-        │   ├── TruckManager.BlazorClient/      //current status: placeholder
-        │   └── TruckManager.ConsoleClient/     //current status: placeholder
+        │   ├── TruckManager.BlazorClient/      //deferred to V2 — directory not yet scaffolded
+        │   └── TruckManager.ConsoleClient/     //deferred to V2 — directory not yet scaffolded
         ├── tests/
         │   ├── TruckManager.UnitTests/
         │   ├── TruckManager.IntegrationTests/
@@ -64,42 +64,55 @@ Verify the SDK is picked up correctly inside this directory:
 
 ---
 
-## Quick start *(planned — works once Phase 1 is complete)*:
+## Quick start:
+
+**Recommended path (docker-compose, API in container — host port 5000 → container 8080):**
     ```bash
-    #   1.  Start Postgres (and later, the API) via docker-compose.
-    #       The override file adds local-dev settings (exposed ports, Development env).
+    #   1.  Start Postgres + the API.
+    #       The override file exposes ports and sets ASPNETCORE_ENVIRONMENT=Development.
+    #       MigrationRunner auto-applies pending migrations on API startup (ADR-0018).
     docker compose \
         -f docker/docker-compose.yml \
         -f docker/docker-compose.override.yml \
         up -d
-    
-    #   2.  Apply EF Core migrations (added in Phase 4)
-    dotnet ef database update \
-        --project src/TruckManager.Infrastructure \
-        --startup-project src/TruckManager.Api
-    
-    #   3.  Run the API
-    dotnet run --project src/TruckManager.Api
-    
-    #   4.  Health check
+
+    #   2.  Liveness check (HealthController, always 200 if the process is up)
     curl http://localhost:5000/health
     # expected: {"status":"healthy"}
+
+    #   3.  Readiness check (StatusBijectionHealthCheck — 200 only after dictionary bijection verified)
+    curl http://localhost:5000/health/ready
     ```
-Swagger UI will be at `http://localhost:5000/swagger` once Phase 6 lands.
+
+**Alternative path (API on host, Postgres in container — host port 5221):**
+    ```bash
+    #   1.  Postgres only (host port 5432 exposed by docker-compose.override.yml).
+    docker compose -f docker/docker-compose.yml -f docker/docker-compose.override.yml up -d postgres
+
+    #   2.  Run the API on the host.
+    dotnet run --project src/TruckManager.Api
+    # Kestrel HTTP profile listens on http://localhost:5221 (see launchSettings.json).
+
+    #   3.  Health check
+    curl http://localhost:5221/health
+    ```
+
+Swagger UI will be at `/swagger` once Phase 6 lands (port 5000 via docker, 5221 via `dotnet run`).
 
 ---
 
-## Tests *(planned — works once test projects are scaffolded)*:
+## Tests:
     ```bash
     dotnet test solutions/TruckManager.WebApi.sln
     ```
+    As of Phase 5 close: **197 unit + 45 integration tests passing.** ArchitectureTests project is scaffolded but holds no tests yet (lands in Phase 8).
 
     Three test projects:
     |   Project                             |   Covers                                                                              |
     |---------------------------------------|---------------------------------------------------------------------------------------|
-    |   `TruckManager.UnitTests`            |   Domain invariants, value objects, validators, handler logic                         |
-    |   `TruckManager.IntegrationTests`     |   API endpoints + persistence (Testcontainers Postgres)                               |
-    |   `TruckManager.ArchitectureTests`    |   Layer boundaries, banned APIs (e.g. `DateTime.UtcNow` outside `IDateTimeProvider`)  |
+    |   `TruckManager.UnitTests`            |   Domain invariants, value objects, validators, handler logic, pipeline behaviors     |
+    |   `TruckManager.IntegrationTests`     |   Persistence (dual-write, soft-delete, concurrency) + CQRS pipeline smoke tests via Testcontainers Postgres |
+    |   `TruckManager.ArchitectureTests`    |   Layer boundaries, banned APIs (e.g. `DateTime.UtcNow` outside `IDateTimeProvider`) — populated in Phase 8 |
 
 ---
 
