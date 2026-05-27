@@ -7,8 +7,6 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
 // Phase 5 / Section A.  Application composition: CQRS dispatchers, handler assembly scan, FluentValidators.
 // Pipeline behaviors land in Section B alongside IUnitOfWork.
@@ -28,18 +26,23 @@ builder.Services.AddHealthChecks()
 
 WebApplication application = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (application.Environment.IsDevelopment())
-{
-    application.MapOpenApi();
-}
-
 // HTTPS redirection intentionally omitted: Phase 1 local stack runs HTTP-only inside Docker (port 8080).
 // Add `application.UseHttpsRedirection()` back when a real TLS termination point exists.
 
 application.UseAuthorization();
 
 application.MapControllers();
+
+// Phase 6 / Section A.1.  Health endpoints exposed via Minimal APIs.
+// Liveness ("/health") - is the process up? Trivial, never touches the DB. Orchestrators
+// (Docker, Kubernetes, load balancers) use this to decide whether to RESTART the container.
+// Must succeed on every running instance regardless of dependency state.
+application.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+// Readiness ("/health/ready") - is this instance ready to serve traffic? Backed by the
+// StatusBijectionHealthCheck registered above; returns 503 until startup verification passes.
+// Orchestrators use this to decide whether to ROUTE TRAFFIC to the instance (but never to restart).
+// Intentionally NOT placed under /api/v{version}/ - health endpoints are infrastructure contracts
+// for orchestrators, not API consumers, and must stay stable across API version bumps.
 application.MapHealthChecks("/health/ready");
 
 application.Run();
