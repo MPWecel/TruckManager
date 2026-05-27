@@ -11,12 +11,18 @@
         <PackageReference Include="xunit.v3" />
         <PackageReference Include="xunit.runner.visualstudio" />
         <PackageReference Include="AwesomeAssertions" />
+        <!-- InMemory provider gives Application-layer handler tests a real EF Core DbContext without an external database. 
+                Infrastructure is referenced for ApplicationDbContext + its entity configuration (owned types, value converters, strongly-typed ID convention). 
+                No circular dependency: Unit → Infrastructure → Application → Domain → Common. 
+          -->
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\TruckManager.Common\TruckManager.Common.csproj" />
         <ProjectReference Include="..\..\src\TruckManager.Domain\TruckManager.Domain.csproj" />
         <ProjectReference Include="..\..\src\TruckManager.Application\TruckManager.Application.csproj" />
+        <ProjectReference Include="..\..\src\TruckManager.Infrastructure\TruckManager.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
