@@ -5,6 +5,12 @@
         <ProjectReference Include="..\TruckManager.Domain\TruckManager.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- Phase 5: handler/dispatcher DI, validator assembly scanning. -->
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    </ItemGroup>
+
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>

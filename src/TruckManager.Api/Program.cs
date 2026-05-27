@@ -1,3 +1,4 @@
+using TruckManager.Application;
 using TruckManager.Infrastructure;
 using TruckManager.Infrastructure.Workflows;
 
@@ -9,14 +10,16 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// Phase 4 / Section F.  Single composition-root call for the persistence + workflow +
-// audit pipeline (DbContext + interceptors, transition policy, bijection check, audit
-// + event hosted services, IDateTimeProvider, stub ICurrentUserService).
+// Phase 5 / Section A.  Application composition: CQRS dispatchers, handler assembly scan, FluentValidators.
+// Pipeline behaviors land in Section B alongside IUnitOfWork.
+builder.Services.AddTruckManagerApplication();
+
+// Phase 4 / Section F.  Single composition-root call for the persistence + workflow + audit pipeline
+// (DbContext + interceptors, transition policy, bijection check, audit + event hosted services, IDateTimeProvider, stub ICurrentUserService).
 builder.Services.AddTruckManagerInfrastructure(builder.Configuration);
 
-// Expose the bijection check at /health/ready. The check itself is the singleton
-// registered by AddTruckManagerInfrastructure (same instance the IHostedService startup
-// path uses), so this endpoint reads its _isReady flag without re-querying the DB.
+// Expose the bijection check at /health/ready. The check itself is the singleton registered by AddTruckManagerInfrastructure
+// (same instance the IHostedService startup path uses), so this endpoint reads its _isReady flag without re-querying the DB.
 builder.Services.AddHealthChecks()
                 .AddCheck<StatusBijectionHealthCheck>(
                                                          name: "workflow_bijection",
