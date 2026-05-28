@@ -28,10 +28,15 @@ public static class DependencyInjection
                 .AddScoped<IQueryDispatcher, QueryDispatcher>();
 
         // Pipeline behaviors — open-generic registration; resolved at SendAsync time.
-        // [Phase 7: add LoggingBehavior<,> here, before ValidationBehavior, so it wraps the full pipeline.]
-        // ValidationBehavior runs on both command and query pipelines.
-        // UnitOfWorkBehavior is constrained to IBaseCommand — query types are skipped automatically.
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>))
+        // Execution order is registration order (first registered = outermost).
+        // The dispatcher composes them around the handler via Reverse() in CommandDispatcher / QueryDispatcher, so the visible composition is:
+        //      LoggingBehavior → ValidationBehavior → UnitOfWorkBehavior → Handler
+        //
+        //   >  LoggingBehavior   (Phase 7 / Section C)  — wraps everything; observes start, success/failure outcome, elapsed ms, and any escaping exception.
+        //   >  ValidationBehavior                       — runs on both command and query pipelines; short-circuits on first validation failure.
+        //   >  UnitOfWorkBehavior                       — IBaseCommand-constrained; query types skip it automatically via DI open-generic resolution.
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>))
+                .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>))
                 .AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
 
         // Handlers — assembly scan over the open-generic CQRS interfaces.

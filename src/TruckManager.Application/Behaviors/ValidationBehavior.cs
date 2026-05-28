@@ -1,7 +1,7 @@
 using System.Reflection;
-
 using FluentValidation;
 using FluentValidation.Results;
+
 using TruckManager.Application.Abstractions.Cqrs;
 using TruckManager.Common.Results;
 
@@ -11,7 +11,7 @@ namespace TruckManager.Application.Behaviors;
 // Registered on both command and query pipelines. Short-circuits on any validation failure — next() is never called.
 // Returns a TResult constructed via reflection over TResult's static Failure factory so callers always receive a Result / Result<T> - never an exception on validation failure.
 // s_failureFactory is resolved once per closed generic instantiation (static field in a generic class), so the reflection cost is bounded to startup / first-use.
-// [Phase 7: LoggingBehavior slots before this in the pipeline.]
+// Wrapped by LoggingBehavior (Phase 7 / Section C) — outcome (success/failure/exception) is logged at the outer scope.
 public sealed class ValidationBehavior<TRequest, TResult>(IEnumerable<IValidator<TRequest>> validators) : IPipelineBehavior<TRequest, TResult>
 {
     private const BindingFlags _bindingFlagAggregate = BindingFlags.Public | BindingFlags.Static;
@@ -23,11 +23,7 @@ public sealed class ValidationBehavior<TRequest, TResult>(IEnumerable<IValidator
 
     private readonly IEnumerable<IValidator<TRequest>> _validators = validators;
 
-    public async Task<TResult> HandleAsync(
-                                              TRequest request,
-                                              Func<Task<TResult>> next,
-                                              CancellationToken cancellationToken
-                                          )
+    public async Task<TResult> HandleAsync(TRequest request, Func<Task<TResult>> next, CancellationToken cancellationToken)
     {
         bool hasNoValidators = !_validators.Any();
         if (hasNoValidators)

@@ -1,6 +1,6 @@
+using TruckManager.Common.Results;
 using TruckManager.Application.Abstractions.Cqrs;
 using TruckManager.Application.Abstractions.Persistence;
-using TruckManager.Common.Results;
 
 namespace TruckManager.Application.Behaviors;
 
@@ -11,7 +11,8 @@ namespace TruckManager.Application.Behaviors;
 // Flow: Begin → next() → IResult.IsSuccess? SaveChanges + Commit : Rollback.
 // Handlers must NOT call SaveChangesAsync themselves - that is this behavior's job.
 //
-// [Phase 7: LoggingBehavior can observe the rollback path independently via Serilog.]
+// Wrapped by LoggingBehavior (Phase 7 / Section C) — the commit / rollback decision is observable
+// from the outer log scope via the success/failure outcome of the TResult this behavior returns.
 public sealed class UnitOfWorkBehavior<TCommand, TResult> : IPipelineBehavior<TCommand, TResult> where TCommand : IBaseCommand
 {
     private readonly IUnitOfWork _uow;
@@ -19,14 +20,11 @@ public sealed class UnitOfWorkBehavior<TCommand, TResult> : IPipelineBehavior<TC
     public UnitOfWorkBehavior(IUnitOfWork uow)
     {
         ArgumentNullException.ThrowIfNull(uow);
+
         _uow = uow;
     }
 
-    public async Task<TResult> HandleAsync(
-                                              TCommand command,
-                                              Func<Task<TResult>> next,
-                                              CancellationToken cancellationToken
-                                          )
+    public async Task<TResult> HandleAsync(TCommand command, Func<Task<TResult>> next, CancellationToken cancellationToken)
     {
         await _uow.BeginTransactionAsync(cancellationToken);
         TResult result = await next();
