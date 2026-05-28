@@ -1,7 +1,9 @@
+using Microsoft.EntityFrameworkCore;
 using AwesomeAssertions;
 using Xunit;
 
 using TruckManager.Common.Results;
+using TruckManager.Domain.Aggregates.Trucks;
 using TruckManager.Domain.Enums;
 using TruckManager.Infrastructure.Persistence;
 using TruckManager.Application.Trucks.Commands.ChangeTruckStatus;
@@ -90,5 +92,44 @@ public class ChangeTruckStatusHandlerTests
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().ContainSingle()
               .Which.Type.Should().Be(EErrorType.Validation);
+    }
+
+    // ---- Phase 8 / Section G gap-fill ------------------------------------------------
+
+    [Fact]
+    public async Task HandleAsync_returns_Conflict_when_truck_is_deleted()
+    {
+        // The handler queries with IgnoreQueryFilters so it CAN find a soft-deleted truck — at which point Truck.ChangeStatus returns Result.Failure(Conflict) per the deletion guard.
+        // Without this test the deleted-truck path through ChangeTruckStatus was only covered at the aggregate level (TruckStatusChangeTests + TruckDeleteTests); the handler-level wiring stayed implicit.
+        
+        // Arrange
+        string dbName = Guid.NewGuid().ToString();
+        FakeDateTimeProvider clock = new(T0);
+
+        using (ApplicationDbContext seedCtx = TestDbContextFactory.Create(dbName))
+        {
+            Truck truck = TruckTestFactory.NewValid(clock, initialStatus: ETruckStatus.OutOfService);
+            truck.Delete(clock, Guid.NewGuid());
+            seedCtx.Trucks.Add(truck);
+            seedCtx.SaveChanges();
+        }
+
+        using ApplicationDbContext ctx = TestDbContextFactory.Create(dbName);
+        Guid truckId = ctx.Trucks
+                          .IgnoreQueryFilters()
+                          .First().Id.Value;
+
+        ChangeTruckStatusHandler handler = new(ctx, FakeTruckStatusTransitionPolicy.AllowEverything(), FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
+        ChangeTruckStatusCommand command = new(truckId, ETruckStatus.Loading);
+
+        // Act
+        Result result = await handler.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should()
+                        .BeFalse();
+        result.Errors.Should()
+                     .ContainSingle().Which.Type.Should()
+                                                .Be(EErrorType.Conflict);
     }
 }

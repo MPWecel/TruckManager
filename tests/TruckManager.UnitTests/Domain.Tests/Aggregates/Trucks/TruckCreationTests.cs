@@ -154,4 +154,35 @@ public class TruckCreationTests
         //Assert
         act.Should().Throw<ArgumentNullException>();
     }
+
+    // Phase 8 / Section G gap-fill   The remaining four reference-typed parameters all carry ArgumentNullException.ThrowIfNull guards
+    // — covering them via [Theory] keeps the file from growing four near-identical [Fact] blocks.
+    [Theory]
+    [InlineData("tenantId")]
+    [InlineData("code")]
+    [InlineData("name")]
+    [InlineData("description")]
+    public void Create_throws_ArgumentNullException_when_other_reference_parameter_is_null(string nullParam)
+    {
+        //Arrange — start from a valid set and null exactly one parameter per row.
+        TruckId       id          = new(Guid.NewGuid());
+        TenantId      tenantId    = TenantId.Default;
+        TruckCode     code        = TruckCode.Create("TRK01").Value!;
+        TruckName     name        = TruckName.Create("Test").Value!;
+        TruckDescription description = TruckDescription.Create("Desc").Value!;
+        FakeDateTimeProvider clock = new(T0);
+
+        Action act = nullParam switch
+        {
+            "tenantId"    => () => Truck.Create(id, null!, code,  name, description,  ETruckStatus.OutOfService, clock, Guid.NewGuid()),
+            "code"        => () => Truck.Create(id, tenantId, null!, name, description, ETruckStatus.OutOfService, clock, Guid.NewGuid()),
+            "name"        => () => Truck.Create(id, tenantId, code,  null!, description, ETruckStatus.OutOfService, clock, Guid.NewGuid()),
+            "description" => () => Truck.Create(id, tenantId, code,  name, null!,       ETruckStatus.OutOfService, clock, Guid.NewGuid()),
+            _ => throw new ArgumentOutOfRangeException(nameof(nullParam), nullParam, "unhandled parameter name in test row"),
+        };
+
+        //Assert
+        act.Should().Throw<ArgumentNullException>()
+                    .Which.ParamName.Should().Be(nullParam, $"ThrowIfNull derives the paramName from the caller-expression — keeps the failure message specific.");
+    }
 }

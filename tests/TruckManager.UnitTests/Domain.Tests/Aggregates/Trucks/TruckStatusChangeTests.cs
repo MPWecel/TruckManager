@@ -139,7 +139,7 @@ public class TruckStatusChangeTests
 
         foreach (ETruckStatus target in Enum.GetValues<ETruckStatus>())
         {
-            if (target == ETruckStatus.OutOfService) 
+            if (target == ETruckStatus.OutOfService)
                 continue;
 
             //Act
@@ -149,5 +149,38 @@ public class TruckStatusChangeTests
             //Assert
             result.IsSuccess.Should().BeTrue(because: $"OutOfService -> {target} must be allowed");
         }
+    }
+
+    // ---- Phase 8 / Section G gap-fill ------------------------------------------------
+
+    [Fact]
+    public void ChangeStatus_throws_ArgumentNullException_when_policy_is_null()
+    {
+        //Arrange
+        FakeDateTimeProvider clock = new(T0);
+        Truck truck = TruckTestFactory.NewValid(clock, initialStatus: ETruckStatus.Loading);
+
+        //Act
+        Action act = () => truck.ChangeStatus(ETruckStatus.ToJob, null!, clock, Guid.NewGuid());
+
+        //Assert
+        act.Should().Throw<ArgumentNullException>()
+                    .Which.ParamName.Should().Be("policy");
+    }
+
+    [Fact]
+    public void ChangeStatus_throws_ArgumentNullException_when_clock_is_null()
+    {
+        //Arrange
+        FakeDateTimeProvider clock = new(T0);
+        Truck truck = TruckTestFactory.NewValid(clock, initialStatus: ETruckStatus.Loading);
+        FakeTruckStatusTransitionPolicy policy = FakeTruckStatusTransitionPolicy.AllowEverything();
+
+        //Act
+        Action act = () => truck.ChangeStatus(ETruckStatus.ToJob, policy, null!, Guid.NewGuid());
+
+        //Assert
+        act.Should().Throw<ArgumentNullException>()
+                    .Which.ParamName.Should().Be("clock");
     }
 }

@@ -142,7 +142,7 @@ public class TruckUpdateTests
         //Arrange
         FakeDateTimeProvider clock = new(T0);
         Truck truck = TruckTestFactory.NewValid(clock);
-        
+
         //Act
         truck.Delete(clock, Guid.NewGuid());
 
@@ -159,5 +159,98 @@ public class TruckUpdateTests
                               .Should().Be(EErrorType.Conflict);
         truck.ConcurrencyStamp.Should().Be(stampBefore);
         truck.DomainEvents.Should().HaveCount(eventCountBefore);
+    }
+
+    // ---- Phase 8 / Section G gap-fill ------------------------------------------------
+
+    [Fact]
+    public void Update_throws_ArgumentNullException_when_updates_is_null()
+    {
+        //Arrange
+        FakeDateTimeProvider clock = new(T0);
+        Truck truck = TruckTestFactory.NewValid(clock);
+
+        //Act
+        Action act = () => truck.Update(null!, clock, Guid.NewGuid());
+
+        //Assert
+        act.Should().Throw<ArgumentNullException>()
+                    .Which.ParamName.Should().Be("updates");
+    }
+
+    [Fact]
+    public void Update_throws_ArgumentNullException_when_clock_is_null()
+    {
+        //Arrange
+        FakeDateTimeProvider clock = new(T0);
+        Truck truck = TruckTestFactory.NewValid(clock);
+
+        //Act
+        Action act = () => truck.Update(new TruckUpdates(), null!, Guid.NewGuid());
+
+        //Assert
+        act.Should().Throw<ArgumentNullException>()
+                    .Which.ParamName.Should().Be("clock");
+    }
+
+    [Fact]
+    public void Update_setting_description_from_Empty_to_non_empty_raises_TruckDescriptionChanged_with_Empty_old_value()
+    {
+        // Truck.Update treats a description change as "new value present AND not Equal to current". TruckDescription.Empty is a non-null singleton — going Empty→non-empty must produce an event whose OldDescription is the Empty singleton.
+        //Arrange
+        FakeDateTimeProvider clock = new(T0);
+        Truck truck = TruckTestFactory.NewValid(clock, descriptionRaw: ""); // factory's TruckDescription.Create("") collapses to the Empty singleton
+        truck.Description.Should().BeSameAs(TruckDescription.Empty, "precondition: a Truck created with empty description carries the Empty singleton (TruckDescription.Create normalizes empty/whitespace → Empty).");
+
+        //Act
+        TruckDescription newDesc = TruckDescription.Create("Now has a description").Value!;
+        Result result = truck.Update(new TruckUpdates(Description: newDesc), clock, Guid.NewGuid());
+
+        //Assert
+        result.IsSuccess.Should().BeTrue();
+        truck.Description.Value.Should().Be("Now has a description");
+
+        TruckDescriptionChanged evt = truck.DomainEvents.OfType<TruckDescriptionChanged>().Single();
+        evt.OldDescription.Should().BeSameAs(TruckDescription.Empty);
+        evt.NewDescription.Should().Be(newDesc);
+    }
+
+    [Fact]
+    public void Update_clearing_description_from_non_empty_to_Empty_raises_TruckDescriptionChanged_with_Empty_new_value()
+    {
+        // Symmetric to the previous test — the user can clear an existing description by passing TruckDescription.Empty (or equivalently a created-from-empty-string descriptor).
+        //Arrange
+        FakeDateTimeProvider clock = new(T0);
+        Truck truck = TruckTestFactory.NewValid(clock, descriptionRaw: "Existing description");
+        TruckDescription oldDesc = truck.Description;
+
+        //Act
+        Result result = truck.Update(new TruckUpdates(Description: TruckDescription.Empty), clock, Guid.NewGuid());
+
+        //Assert
+        result.IsSuccess.Should().BeTrue();
+        truck.Description.Should().BeSameAs(TruckDescription.Empty);
+
+        TruckDescriptionChanged evt = truck.DomainEvents.OfType<TruckDescriptionChanged>().Single();
+        evt.OldDescription.Should().Be(oldDesc);
+        evt.NewDescription.Should().BeSameAs(TruckDescription.Empty);
+    }
+
+    [Fact]
+    public void Update_changing_only_name_does_not_raise_TruckDescriptionChanged()
+    {
+        // Negative assertion that complements Update_changing_only_name_raises_TruckRenamed_with_old_and_new_values — the rename event arrives but the description event does NOT.
+        //Arrange
+        FakeDateTimeProvider clock = new(T0);
+        Truck truck = TruckTestFactory.NewValid(clock, nameRaw: "Old Name", descriptionRaw: "Unchanged desc");
+        int descEventsBefore = truck.DomainEvents.OfType<TruckDescriptionChanged>().Count();
+
+        //Act
+        TruckName newName = TruckName.Create("New Name").Value!;
+        Result result = truck.Update(new TruckUpdates(Name: newName), clock, Guid.NewGuid());
+
+        //Assert
+        result.IsSuccess.Should().BeTrue();
+        truck.DomainEvents.OfType<TruckDescriptionChanged>().Count().Should().Be(descEventsBefore);
     }
 }

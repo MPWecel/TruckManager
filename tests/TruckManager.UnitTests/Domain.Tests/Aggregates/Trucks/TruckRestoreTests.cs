@@ -105,4 +105,22 @@ public class TruckRestoreTests
                               .Which.Type
                               .Should().Be(EErrorType.Conflict);
     }
+
+    // ---- Phase 8 / Section G gap-fill ------------------------------------------------
+
+    [Fact]
+    public void Restore_throws_ArgumentNullException_when_clock_is_null()
+    {
+        //Arrange
+        FakeDateTimeProvider clock = new(T0);
+        Truck truck = TruckTestFactory.NewValid(clock);
+        truck.Delete(clock, Guid.NewGuid());
+
+        //Act
+        Action act = () => truck.Restore(null!, Guid.NewGuid());
+
+        //Assert
+        act.Should().Throw<ArgumentNullException>()
+                    .Which.ParamName.Should().Be("clock");
+    }
 }
