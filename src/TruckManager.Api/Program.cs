@@ -16,18 +16,22 @@ builder.Services.AddControllers();
 // ReportApiVersions adds the `api-supported-versions` header to every response so clients can discover what's available.
 // AddApiExplorer wires versioning into IApiVersionDescriptionProvider — Swagger (Section F) reads it to produce one OpenAPI document per version.
 // SubstituteApiVersionInUrl rewrites the literal `v{version:apiVersion}` token in the route template into the concrete version string in the generated OpenAPI document (so the Swagger UI shows `/api/v1/trucks`, not `/api/v{version}/trucks`).
-builder.Services.AddApiVersioning(o =>
-                                  {
-                                      o.DefaultApiVersion                     = new ApiVersion(1);
-                                      o.AssumeDefaultVersionWhenUnspecified   = true;
-                                      o.ReportApiVersions                     = true;
-                                  })
+builder.Services.AddApiVersioning(
+                                     o =>
+                                     {
+                                         o.DefaultApiVersion = new ApiVersion(1);
+                                         o.AssumeDefaultVersionWhenUnspecified = true;
+                                         o.ReportApiVersions = true;
+                                     }
+                                 )
                 .AddMvc()
-                .AddApiExplorer(o =>
-                                {
-                                    o.GroupNameFormat               = "'v'VVV";
-                                    o.SubstituteApiVersionInUrl     = true;
-                                });
+                .AddApiExplorer(
+                                   o =>
+                                   {
+                                       o.GroupNameFormat = "'v'VVV";
+                                       o.SubstituteApiVersionInUrl = true;
+                                   }
+                               );
 
 // Phase 5 / Section A  Application composition: CQRS dispatchers, handler assembly scan, FluentValidators.
 // Pipeline behaviors land in Section B alongside IUnitOfWork.

@@ -24,11 +24,9 @@ namespace TruckManager.IntegrationTests.Application;
 //
 // Truck codes are unique per test (UniqueCode()) to avoid conflicts in the shared container.
 // The IClassFixture container is shared across all tests in the class; only non-dictionary tables (Trucks, TruckDomainEvents) are mutated here.
-public sealed class CommandPipelineTests : IClassFixture<PostgresFixture>
+public sealed class CommandPipelineTests(PostgresFixture fixture) : IClassFixture<PostgresFixture>
 {
-    private readonly PostgresFixture _fixture;
-
-    public CommandPipelineTests(PostgresFixture fixture) => _fixture = fixture;
+    private readonly PostgresFixture _fixture = fixture;
 
     // Returns an 8-char uppercase alphanumeric code unique to each call.
     private static string UniqueCode() => Guid.NewGuid()

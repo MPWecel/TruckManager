@@ -22,11 +22,9 @@ namespace TruckManager.IntegrationTests.Application;
 //
 // V1 note: full SQL-level projection verification (asserting only DTO columns are SELECTed) is deferred to Phase 8 architecture tests.
 // These tests confirm correctness of the returned data and that no exceptions occur during projection evaluation against real Postgres.
-public sealed class QueryPipelineTests : IClassFixture<PostgresFixture>
+public sealed class QueryPipelineTests(PostgresFixture fixture) : IClassFixture<PostgresFixture>
 {
-    private readonly PostgresFixture _fixture;
-
-    public QueryPipelineTests(PostgresFixture fixture) => _fixture = fixture;
+    private readonly PostgresFixture _fixture = fixture;
 
     private static string UniqueCode() => Guid.NewGuid()
                                               .ToString("N")

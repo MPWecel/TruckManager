@@ -66,10 +66,7 @@ public class BaseEntityTests
     public void Constructor_throws_when_id_is_null()
     {
         //Arrange
-        Action act = () => new TestEntity(
-            null!,
-            TenantId.Default,
-            ConcurrencyStamp.Initial(new FakeDateTimeProvider(T0)));
+        Action act = () => new TestEntity(null!, TenantId.Default, ConcurrencyStamp.Initial(new FakeDateTimeProvider(T0)));
 
         //Assert
         act.Should().Throw<ArgumentNullException>();
@@ -79,10 +76,7 @@ public class BaseEntityTests
     public void Constructor_throws_when_tenant_is_null()
     {
         //Arrange
-        Action act = () => new TestEntity(
-            new TestEntityId(Guid.NewGuid()),
-            null!,
-            ConcurrencyStamp.Initial(new FakeDateTimeProvider(T0)));
+        Action act = () => new TestEntity(new TestEntityId(Guid.NewGuid()), null!, ConcurrencyStamp.Initial(new FakeDateTimeProvider(T0)));
 
         //Assert
         act.Should().Throw<ArgumentNullException>();
@@ -92,10 +86,7 @@ public class BaseEntityTests
     public void Constructor_throws_when_concurrency_stamp_is_null()
     {
         //Arrange
-        Action act = () => new TestEntity(
-            new TestEntityId(Guid.NewGuid()),
-            TenantId.Default,
-            null!);
+        Action act = () => new TestEntity(new TestEntityId(Guid.NewGuid()), TenantId.Default, null!);
 
         //Assert
         act.Should().Throw<ArgumentNullException>();
@@ -105,9 +96,7 @@ public class BaseEntityTests
 
     private sealed record TestEntityId(Guid Value) : IStronglyTypedId<Guid>;
 
-    private sealed class TestEntity : BaseEntity<TestEntityId>
-    {
-        public TestEntity(TestEntityId id, TenantId tenantId, ConcurrencyStamp concurrencyStamp) : base(id, tenantId, concurrencyStamp)
-        { }
-    }
+    private sealed class TestEntity(TestEntityId id, TenantId tenantId, ConcurrencyStamp concurrencyStamp) 
+        : BaseEntity<TestEntityId>(id, tenantId, concurrencyStamp)
+    { }
 }

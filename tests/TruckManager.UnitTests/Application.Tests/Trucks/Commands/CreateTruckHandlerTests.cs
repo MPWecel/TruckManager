@@ -14,7 +14,7 @@ public class CreateTruckHandlerTests
     private static readonly DateTimeOffset T0 = new(2026, 5, 13, 13, 37, 0, TimeSpan.Zero);
 
     private static CreateTruckHandler BuildHandler() 
-        => new CreateTruckHandler(TestDbContextFactory.Create(), FakeCurrentUserService.Anonymous(), new FakeDateTimeProvider(T0));
+        => new(TestDbContextFactory.Create(), FakeCurrentUserService.Anonymous(), new FakeDateTimeProvider(T0));
 
     // ---- Happy path -------------------------------------------------------
 

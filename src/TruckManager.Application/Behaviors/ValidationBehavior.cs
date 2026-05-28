@@ -9,12 +9,10 @@ namespace TruckManager.Application.Behaviors;
 
 // [ADR-0038 / ADR-0011]   Runs every registered IValidator<TRequest> before the handler.
 // Registered on both command and query pipelines. Short-circuits on any validation failure — next() is never called.
-//
 // Returns a TResult constructed via reflection over TResult's static Failure factory so callers always receive a Result / Result<T> - never an exception on validation failure.
 // s_failureFactory is resolved once per closed generic instantiation (static field in a generic class), so the reflection cost is bounded to startup / first-use.
-//
 // [Phase 7: LoggingBehavior slots before this in the pipeline.]
-public sealed class ValidationBehavior<TRequest, TResult> : IPipelineBehavior<TRequest, TResult>
+public sealed class ValidationBehavior<TRequest, TResult>(IEnumerable<IValidator<TRequest>> validators) : IPipelineBehavior<TRequest, TResult>
 {
     private const BindingFlags _bindingFlagAggregate = BindingFlags.Public | BindingFlags.Static;
     private static readonly MethodInfo s_failureFactory = typeof(TResult).GetMethod(
@@ -23,12 +21,7 @@ public sealed class ValidationBehavior<TRequest, TResult> : IPipelineBehavior<TR
                                                                                        [typeof(IEnumerable<Error>)]
                                                                                    ) ?? throw new InvalidOperationException($"{typeof(TResult).Name} has no static Failure(IEnumerable<Error>) factory. TResult must be Result or Result<T>.");
 
-    private readonly IEnumerable<IValidator<TRequest>> _validators;
-
-    public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
-    {
-        _validators = validators;
-    }
+    private readonly IEnumerable<IValidator<TRequest>> _validators = validators;
 
     public async Task<TResult> HandleAsync(
                                               TRequest request,

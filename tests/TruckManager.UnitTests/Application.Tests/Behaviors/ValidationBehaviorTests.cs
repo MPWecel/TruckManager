@@ -21,7 +21,8 @@ public class ValidationBehaviorTests
 
     // ---- Helpers ----------------------------------------------------------
 
-    private static ValidationBehavior<TestCommand, Result> BuildBehavior(IEnumerable<IValidator<TestCommand>> validators) => new(validators);
+    private static ValidationBehavior<TestCommand, Result> BuildBehavior(IEnumerable<IValidator<TestCommand>> validators) 
+        => new(validators);
 
     // ---- No validators ----------------------------------------------------
 
@@ -33,12 +34,11 @@ public class ValidationBehaviorTests
         TestCommand command = new("anything");
         bool nextCalled = false;
 
-        Func<Task<Result>> next = 
-            () =>
-            {
-                nextCalled = true;
-                return Task.FromResult(Result.Success());
-            };
+        Func<Task<Result>> next = () =>
+                                  {
+                                      nextCalled = true;
+                                      return Task.FromResult(Result.Success());
+                                  };
 
         // Act
         Result result = await behavior.HandleAsync(command, next, CancellationToken.None);
@@ -60,12 +60,11 @@ public class ValidationBehaviorTests
         TestCommand command = new("non-empty");
         bool nextCalled = false;
 
-        Func<Task<Result>> next = 
-            () =>
-            {
-                nextCalled = true;
-                return Task.FromResult(Result.Success());
-            };
+        Func<Task<Result>> next = () =>
+                                  {
+                                      nextCalled = true;
+                                      return Task.FromResult(Result.Success());
+                                  };
 
         // Act
         Result result = await behavior.HandleAsync(command, next, CancellationToken.None);
@@ -87,12 +86,11 @@ public class ValidationBehaviorTests
         TestCommand command = new("");   // triggers NotEmpty
         bool nextCalled = false;
 
-        Func<Task<Result>> next = 
-            () =>
-            {
-                nextCalled = true;
-                return Task.FromResult(Result.Success());
-            };
+        Func<Task<Result>> next = () =>
+                                  {
+                                      nextCalled = true;
+                                      return Task.FromResult(Result.Success());
+                                  };
 
         // Act
         Result result = await behavior.HandleAsync(command, next, CancellationToken.None);

@@ -42,8 +42,8 @@ public sealed class CreateTruckHandler : ICommandHandler<CreateTruckCommand, Res
             return Task.FromResult(Result<TruckId>.Failure(descResult.Errors));
 
         Guid userId = _currentUser.UserId ?? Guid.Empty;
-        TenantId tenantId = new TenantId(command.TenantId);
-        TruckId truckId = new TruckId(Guid.CreateVersion7(_clock.UtcNow));
+        TenantId tenantId = new(command.TenantId);
+        TruckId truckId = new(Guid.CreateVersion7(_clock.UtcNow));
 
         Result<Truck> truckResult = Truck.Create(
                                                     id: truckId,
