@@ -1,3 +1,5 @@
+using Asp.Versioning;
+
 using TruckManager.Api.Middleware;
 using TruckManager.Application;
 using TruckManager.Infrastructure;
@@ -8,6 +10,24 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+// Phase 6 / Section D   URL-segment API versioning (`/api/v{version:apiVersion}/...`) [decision #1].
+// DefaultApiVersion + AssumeDefaultVersionWhenUnspecified mean a request without an explicit version resolves to v1 (graceful — old clients that haven't adopted versioning still work).
+// ReportApiVersions adds the `api-supported-versions` header to every response so clients can discover what's available.
+// AddApiExplorer wires versioning into IApiVersionDescriptionProvider — Swagger (Section F) reads it to produce one OpenAPI document per version.
+// SubstituteApiVersionInUrl rewrites the literal `v{version:apiVersion}` token in the route template into the concrete version string in the generated OpenAPI document (so the Swagger UI shows `/api/v1/trucks`, not `/api/v{version}/trucks`).
+builder.Services.AddApiVersioning(o =>
+                                  {
+                                      o.DefaultApiVersion                     = new ApiVersion(1);
+                                      o.AssumeDefaultVersionWhenUnspecified   = true;
+                                      o.ReportApiVersions                     = true;
+                                  })
+                .AddMvc()
+                .AddApiExplorer(o =>
+                                {
+                                    o.GroupNameFormat               = "'v'VVV";
+                                    o.SubstituteApiVersionInUrl     = true;
+                                });
 
 // Phase 5 / Section A  Application composition: CQRS dispatchers, handler assembly scan, FluentValidators.
 // Pipeline behaviors land in Section B alongside IUnitOfWork.
