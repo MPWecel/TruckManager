@@ -1,6 +1,10 @@
 using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 using TruckManager.Api.Middleware;
+using TruckManager.Api.Swagger;
 using TruckManager.Application;
 using TruckManager.Infrastructure;
 using TruckManager.Infrastructure.Workflows;
@@ -33,6 +37,12 @@ builder.Services.AddApiVersioning(
                                    }
                                );
 
+// Phase 6 / Section F   Swagger / OpenAPI document generation [decision #2].
+// AddSwaggerGen registers the document generator; ConfigureSwaggerOptions adds one SwaggerDoc per API version via IApiVersionDescriptionProvider (registered above by AddApiExplorer).
+// The IConfigureOptions<> indirection bridges service-registration time (SwaggerGen config) and service-resolution time (when IApiVersionDescriptionProvider is available).
+builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
 // Phase 5 / Section A  Application composition: CQRS dispatchers, handler assembly scan, FluentValidators.
 // Pipeline behaviors land in Section B alongside IUnitOfWork.
 builder.Services.AddTruckManagerApplication();
@@ -58,6 +68,29 @@ WebApplication application = builder.Build();
 
 // HTTPS redirection intentionally omitted: Phase 1 local stack runs HTTP-only inside Docker (port 8080).
 // Add `application.UseHttpsRedirection()` back when a real TLS termination point exists.
+
+// Phase 6 / Section F   Swagger UI exposed in Development only.
+// Per-version endpoint loop: every API version discovered by IApiVersionDescriptionProvider gets its own Swagger UI dropdown entry pointing at /swagger/{groupName}/swagger.json.
+// When v2 lands alongside v1, the dropdown carries both with no code change here.
+if (application.Environment.IsDevelopment())
+{
+    application.UseSwagger();
+    application.UseSwaggerUI(
+                                uiOptions =>
+                                {
+                                    IApiVersionDescriptionProvider versionProvider = 
+                                        application.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+                                
+                                    foreach (ApiVersionDescription description in versionProvider.ApiVersionDescriptions)
+                                    {
+                                        uiOptions.SwaggerEndpoint(
+                                                                     url: $"/swagger/{description.GroupName}/swagger.json",
+                                                                     name: $"TruckManager API {description.GroupName.ToUpperInvariant()}"
+                                                                 );
+                                    }
+                                }
+                            );
+}
 
 // Phase 6 / Section B.  Exception + status-code middleware first in the pipeline so they catch anything from later layers (auth, controllers, minimal APIs):
 //   > UseExceptionHandler() iterates registered IExceptionHandlers in order; GlobalExceptionHandler handles every unhandled exception and writes a 500 ProblemDetails.
