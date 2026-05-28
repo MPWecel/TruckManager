@@ -21,8 +21,10 @@ public class ConcurrencyStampTests
         DateTimeOffset expectedLastModifiedDate = T0;
 
         //Assert
-        stamp.Version.Should().Be(expectedVersion);
-        stamp.LastModifiedUtc.Should().Be(expectedLastModifiedDate);
+        stamp.Version.Should()
+                     .Be(expectedVersion);
+        stamp.LastModifiedUtc.Should()
+                             .Be(expectedLastModifiedDate);
     }
 
     [Fact]
@@ -41,8 +43,10 @@ public class ConcurrencyStampTests
         ConcurrencyStamp next = initial.Next(clock);
 
         //Assert
-        next.Version.Should().Be(expectedVersion);
-        next.LastModifiedUtc.Should().Be(expectedLastModifiedDate);
+        next.Version.Should()
+                    .Be(expectedVersion);
+        next.LastModifiedUtc.Should()
+                            .Be(expectedLastModifiedDate);
     }
 
     [Fact]
@@ -65,8 +69,10 @@ public class ConcurrencyStampTests
         }
 
         //Assert
-        stamp.Version.Should().Be(expectedVersion);
-        stamp.LastModifiedUtc.Should().Be(expectedLastModifiedDate);
+        stamp.Version.Should()
+                     .Be(expectedVersion);
+        stamp.LastModifiedUtc.Should()
+                             .Be(expectedLastModifiedDate);
     }
 
     [Fact]
@@ -80,7 +86,8 @@ public class ConcurrencyStampTests
         ConcurrencyStamp.Initial(clock);
 
         //Assert
-        clock.UtcNow.Should().Be(captured);
+        clock.UtcNow.Should()
+                    .Be(captured);
     }
 
     [Fact]
@@ -99,9 +106,12 @@ public class ConcurrencyStampTests
         ConcurrencyStamp updated = original.Next(clock);
 
         //Assert
-        original.Version.Should().Be(expectedVersion);
-        original.LastModifiedUtc.Should().Be(expectedLastModifiedDate);
-        updated.Should().NotBeSameAs(original);
+        original.Version.Should()
+                        .Be(expectedVersion);
+        original.LastModifiedUtc.Should()
+                                .Be(expectedLastModifiedDate);
+        updated.Should()
+               .NotBeSameAs(original);
     }
 
     [Fact]
@@ -112,8 +122,12 @@ public class ConcurrencyStampTests
         ConcurrencyStamp b = new(3UL, T0);
 
         //Assert
-        a.Should().Be(b);
-        a.GetHashCode().Should().Be(b.GetHashCode());
+        a.Should()
+         .Be(b);
+        int aHash = a.GetHashCode();
+        int bHash = b.GetHashCode();
+        aHash.Should()
+             .Be(bHash);
     }
 
     [Fact]
@@ -124,18 +138,21 @@ public class ConcurrencyStampTests
         ConcurrencyStamp b = new(4UL, T0);
 
         //Assert
-        a.Should().NotBe(b);
+        a.Should()
+         .NotBe(b);
     }
 
     [Fact]
     public void Stamps_with_different_timestamps_are_not_equal()
     {
         //Arrange
-        ConcurrencyStamp a = new(3UL, T0);
-        ConcurrencyStamp b = new(3UL, T0.AddSeconds(1));
+        ulong versionNo = 3UL;
+        ConcurrencyStamp a = new(versionNo, T0);
+        ConcurrencyStamp b = new(versionNo, T0.AddSeconds(1));
 
         //Assert
-        a.Should().NotBe(b);
+        a.Should()
+         .NotBe(b);
     }
 
     [Fact]
@@ -145,7 +162,8 @@ public class ConcurrencyStampTests
         Action act = () => ConcurrencyStamp.Initial(null!);
 
         //Assert
-        act.Should().Throw<ArgumentNullException>();
+        act.Should()
+           .Throw<ArgumentNullException>();
     }
 
     [Fact]
@@ -158,6 +176,7 @@ public class ConcurrencyStampTests
         Action act = () => stamp.Next(null!);
 
         //Assert
-        act.Should().Throw<ArgumentNullException>();
+        act.Should()
+           .Throw<ArgumentNullException>();
     }
 }

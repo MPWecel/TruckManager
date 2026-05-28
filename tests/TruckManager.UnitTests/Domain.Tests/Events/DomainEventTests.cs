@@ -48,15 +48,24 @@ public class DomainEventTests
                                  );
 
         //Assert
-        evt.EventId.Should().Be(eventId);
-        evt.AggregateId.Should().Be(aggregateId);
-        evt.AggregateVersion.Should().Be(aggregateVersion);
-        evt.OccurredAtUtc.Should().Be(T0);
-        evt.PerformedByUserId.Should().Be(userId);
-        evt.TenantId.Should().Be(TenantId.Default);
-        evt.CorrelationId.Should().Be(correlationId);
-        evt.CausationId.Should().Be(causationId);
-        evt.Payload.Should().Be(payload);
+        evt.EventId.Should()
+                   .Be(eventId);
+        evt.AggregateId.Should()
+                       .Be(aggregateId);
+        evt.AggregateVersion.Should()
+                            .Be(aggregateVersion);
+        evt.OccurredAtUtc.Should()
+                         .Be(T0);
+        evt.PerformedByUserId.Should()
+                             .Be(userId);
+        evt.TenantId.Should()
+                    .Be(TenantId.Default);
+        evt.CorrelationId.Should()
+                         .Be(correlationId);
+        evt.CausationId.Should()
+                       .Be(causationId);
+        evt.Payload.Should()
+                   .Be(payload);
     }
 
     [Fact]
@@ -69,8 +78,10 @@ public class DomainEventTests
         TestDomainEvent b = a with { };
 
         //Assert
-        a.Should().Be(b);
-        a.GetHashCode().Should().Be(b.GetHashCode());
+        a.Should()
+         .Be(b);
+        a.GetHashCode().Should()
+                       .Be(b.GetHashCode());
     }
 
     [Fact]
@@ -82,7 +93,8 @@ public class DomainEventTests
         TestDomainEvent b = a with { EventId = newEventId };
 
         //Assert
-        a.Should().NotBe(b);
+        a.Should()
+         .NotBe(b);
     }
 
     [Fact]
@@ -95,7 +107,8 @@ public class DomainEventTests
         TestDomainEvent b = a with { Payload = payloadB };
 
         //Assert
-        a.Should().NotBe(b);
+        a.Should()
+         .NotBe(b);
     }
 
     [Fact]
@@ -105,10 +118,11 @@ public class DomainEventTests
         TestDomainEvent evt = NewEvent();
 
         //Assert
-        evt.Should().BeAssignableTo<DomainEvent>();
+        evt.Should()
+           .BeAssignableTo<DomainEvent>();
     }
 
-    // ---- Test event type (only exists inside this test project) ----------------
+    #region TestEventType
 
     private sealed record TestDomainEvent(
                                              Guid EventId,
@@ -130,4 +144,5 @@ public class DomainEventTests
                                                             CorrelationId, 
                                                             CausationId
                                                         );
+    #endregion
 }

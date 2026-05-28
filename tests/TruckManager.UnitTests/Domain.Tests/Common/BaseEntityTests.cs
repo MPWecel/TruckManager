@@ -25,9 +25,12 @@ public class BaseEntityTests
         TestEntity entity = new(id, tenant, stamp);
 
         //Assert
-        entity.Id.Should().Be(id);
-        entity.TenantId.Should().Be(tenant);
-        entity.ConcurrencyStamp.Should().Be(stamp);
+        entity.Id.Should()
+                 .Be(id);
+        entity.TenantId.Should()
+                       .Be(tenant);
+        entity.ConcurrencyStamp.Should()
+                               .Be(stamp);
     }
 
     [Fact]
@@ -45,8 +48,10 @@ public class BaseEntityTests
 
         //Assert
         // Same id, tenant, and concurrency stamp — but distinct instances should not be equal.
-        a.Should().NotBe(b);
-        a.Equals(b).Should().BeFalse();
+        a.Should()
+         .NotBe(b);
+        a.Equals(b).Should()
+                   .BeFalse();
     }
 
     [Fact]
@@ -58,8 +63,10 @@ public class BaseEntityTests
 
         //Assert
         // ReSharper disable once EqualExpressionComparison
-        entity.Equals(entity).Should().BeTrue();
-        entity.GetHashCode().Should().Be(entity.GetHashCode());
+        entity.Equals(entity).Should()
+                             .BeTrue();
+        entity.GetHashCode().Should()
+                            .Be(entity.GetHashCode());
     }
 
     [Fact]
@@ -69,7 +76,8 @@ public class BaseEntityTests
         Action act = () => new TestEntity(null!, TenantId.Default, ConcurrencyStamp.Initial(new FakeDateTimeProvider(T0)));
 
         //Assert
-        act.Should().Throw<ArgumentNullException>();
+        act.Should()
+           .Throw<ArgumentNullException>();
     }
 
     [Fact]
@@ -79,7 +87,8 @@ public class BaseEntityTests
         Action act = () => new TestEntity(new TestEntityId(Guid.NewGuid()), null!, ConcurrencyStamp.Initial(new FakeDateTimeProvider(T0)));
 
         //Assert
-        act.Should().Throw<ArgumentNullException>();
+        act.Should()
+           .Throw<ArgumentNullException>();
     }
 
     [Fact]
@@ -89,14 +98,17 @@ public class BaseEntityTests
         Action act = () => new TestEntity(new TestEntityId(Guid.NewGuid()), TenantId.Default, null!);
 
         //Assert
-        act.Should().Throw<ArgumentNullException>();
+        act.Should()
+           .Throw<ArgumentNullException>();
     }
 
-    // ---- Test types (only exist inside this test project, not in Domain) -------
+    #region TestTypes
 
     private sealed record TestEntityId(Guid Value) : IStronglyTypedId<Guid>;
 
     private sealed class TestEntity(TestEntityId id, TenantId tenantId, ConcurrencyStamp concurrencyStamp) 
         : BaseEntity<TestEntityId>(id, tenantId, concurrencyStamp)
     { }
+
+    #endregion
 }

@@ -1,6 +1,7 @@
 using AwesomeAssertions;
-using TruckManager.Common.Results;
 using Xunit;
+
+using TruckManager.Common.Results;
 
 namespace TruckManager.UnitTests.Application.Tests.Results;
 
@@ -9,7 +10,7 @@ public class ResultTests
     private static readonly Error SampleError = new("test.code", "test message", EErrorType.Validation);
     private static readonly Error AnotherError = new("test.other", "another message", EErrorType.NotFound);
 
-    // ---- Result (non-generic) --------------------------------------------------
+    #region NonGenericResultClassTests
 
     [Fact]
     public void Success_yields_successful_result_with_no_errors()
@@ -18,9 +19,12 @@ public class ResultTests
         Result result = Result.Success();
 
         //Assert
-        result.IsSuccess.Should().BeTrue();
-        result.IsFailure.Should().BeFalse();
-        result.Errors.Should().BeEmpty();
+        result.IsSuccess.Should()
+                        .BeTrue();
+        result.IsFailure.Should()
+                        .BeFalse();
+        result.Errors.Should()
+                     .BeEmpty();
     }
 
     [Fact]
@@ -30,9 +34,13 @@ public class ResultTests
         Result result = Result.Failure(SampleError);
 
         //Assert
-        result.IsSuccess.Should().BeFalse();
-        result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainSingle().Which.Should().Be(SampleError);
+        result.IsSuccess.Should()
+                        .BeFalse();
+        result.IsFailure.Should()
+                        .BeTrue();
+        result.Errors.Should()
+                     .ContainSingle().Which.Should()
+                                           .Be(SampleError);
     }
 
     [Fact]
@@ -42,10 +50,14 @@ public class ResultTests
         Result result = Result.Failure([SampleError, AnotherError]);
 
         //Assert
-        result.IsFailure.Should().BeTrue();
-        result.Errors.Should().HaveCount(2);
-        result.Errors[0].Should().Be(SampleError);
-        result.Errors[1].Should().Be(AnotherError);
+        result.IsFailure.Should()
+                        .BeTrue();
+        result.Errors.Should()
+                     .HaveCount(2);
+        result.Errors[0].Should()
+                        .Be(SampleError);
+        result.Errors[1].Should()
+                        .Be(AnotherError);
     }
 
     [Fact]
@@ -55,7 +67,8 @@ public class ResultTests
         Action act = () => Result.Failure(Array.Empty<Error>());
 
         //Assert
-        act.Should().Throw<ArgumentException>();
+        act.Should()
+           .Throw<ArgumentException>();
     }
 
     [Fact]
@@ -65,11 +78,16 @@ public class ResultTests
         Result result = SampleError;
 
         //Assert
-        result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainSingle().Which.Should().Be(SampleError);
+        result.IsFailure.Should()
+                        .BeTrue();
+        result.Errors.Should()
+                     .ContainSingle().Which.Should()
+                                           .Be(SampleError);
     }
 
-    // ---- Result<T> -------------------------------------------------------------
+    #endregion
+
+    #region GenericResultClassTests
 
     [Fact]
     public void Success_T_carries_value_and_is_successful()
@@ -78,9 +96,12 @@ public class ResultTests
         Result<int> result = Result<int>.Success(42);
 
         //Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().Be(42);
-        result.Errors.Should().BeEmpty();
+        result.IsSuccess.Should()
+                        .BeTrue();
+        result.Value.Should()
+                    .Be(42);
+        result.Errors.Should()
+                     .BeEmpty();
     }
 
     [Fact]
@@ -90,9 +111,13 @@ public class ResultTests
         Result<int> result = Result<int>.Failure(SampleError);
 
         //Assert
-        result.IsFailure.Should().BeTrue();
-        result.Value.Should().Be(default(int));
-        result.Errors.Should().ContainSingle().Which.Should().Be(SampleError);
+        result.IsFailure.Should()
+                        .BeTrue();
+        result.Value.Should()
+                    .Be(default(int));
+        result.Errors.Should()
+                     .ContainSingle().Which.Should()
+                                           .Be(SampleError);
     }
 
     [Fact]
@@ -102,7 +127,8 @@ public class ResultTests
         Action act = () => Result<int>.Failure(Array.Empty<Error>());
 
         //Assert
-        act.Should().Throw<ArgumentException>();
+        act.Should()
+           .Throw<ArgumentException>();
     }
 
     [Fact]
@@ -112,8 +138,10 @@ public class ResultTests
         Result<string> result = "hello";
 
         //Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().Be("hello");
+        result.IsSuccess.Should()
+                        .BeTrue();
+        result.Value.Should()
+                    .Be("hello");
     }
 
     [Fact]
@@ -123,11 +151,16 @@ public class ResultTests
         Result<string> result = SampleError;
 
         //Assert
-        result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainSingle().Which.Should().Be(SampleError);
+        result.IsFailure.Should()
+                        .BeTrue();
+        result.Errors.Should()
+                     .ContainSingle().Which.Should()
+                                           .Be(SampleError);
     }
 
-    // ---- ResultExtensions ------------------------------------------------------
+    #endregion
+
+    #region ResultExtensionTests
 
     [Fact]
     public void Map_transforms_successful_value()
@@ -139,8 +172,10 @@ public class ResultTests
         Result<string> mapped = input.Map(x => x.ToString(System.Globalization.CultureInfo.InvariantCulture));
 
         //Assert
-        mapped.IsSuccess.Should().BeTrue();
-        mapped.Value.Should().Be("5");
+        mapped.IsSuccess.Should()
+                        .BeTrue();
+        mapped.Value.Should()
+                    .Be("5");
     }
 
     [Fact]
@@ -160,9 +195,13 @@ public class ResultTests
                                          );
 
         //Assert
-        mapped.IsFailure.Should().BeTrue();
-        mapped.Errors.Should().ContainSingle().Which.Should().Be(SampleError);
-        mapperInvoked.Should().BeFalse();
+        mapped.IsFailure.Should()
+                        .BeTrue();
+        mapped.Errors.Should()
+                     .ContainSingle().Which.Should()
+                                           .Be(SampleError);
+        mapperInvoked.Should()
+                     .BeFalse();
     }
 
     [Fact]
@@ -175,8 +214,10 @@ public class ResultTests
         Result<string> bound = input.Bind(x => Result<string>.Success($"value:{x}"));
 
         //Assert
-        bound.IsSuccess.Should().BeTrue();
-        bound.Value.Should().Be("value:5");
+        bound.IsSuccess.Should()
+                       .BeTrue();
+        bound.Value.Should()
+                   .Be("value:5");
     }
 
     [Fact]
@@ -196,9 +237,13 @@ public class ResultTests
                                          );
 
         //Assert
-        bound.IsFailure.Should().BeTrue();
-        bound.Errors.Should().ContainSingle().Which.Should().Be(SampleError);
-        binderInvoked.Should().BeFalse();
+        bound.IsFailure.Should()
+                       .BeTrue();
+        bound.Errors.Should()
+                    .ContainSingle().Which.Should()
+                                          .Be(SampleError);
+        binderInvoked.Should()
+                     .BeFalse();
     }
 
     [Fact]
@@ -211,8 +256,11 @@ public class ResultTests
         Result<string> bound = input.Bind(_ => Result<string>.Failure(AnotherError));
 
         //Assert
-        bound.IsFailure.Should().BeTrue();
-        bound.Errors.Should().ContainSingle().Which.Should().Be(AnotherError);
+        bound.IsFailure.Should()
+                       .BeTrue();
+        bound.Errors.Should()
+                    .ContainSingle().Which.Should()
+                                          .Be(AnotherError);
     }
 
     [Fact]
@@ -226,8 +274,10 @@ public class ResultTests
         Result<int> output = input.Tap(x => captured = x);
 
         //Assert
-        output.Should().BeSameAs(input);
-        captured.Should().Be(7);
+        output.Should()
+              .BeSameAs(input);
+        captured.Should()
+                .Be(7);
     }
 
     [Fact]
@@ -241,8 +291,10 @@ public class ResultTests
         Result<int> output = input.Tap(_ => actionInvoked = true);
 
         //Assert
-        output.Should().BeSameAs(input);
-        actionInvoked.Should().BeFalse();
+        output.Should()
+              .BeSameAs(input);
+        actionInvoked.Should()
+                     .BeFalse();
     }
 
     [Fact]
@@ -258,7 +310,8 @@ public class ResultTests
                                    );
 
         //Assert
-        output.Should().Be("ok:3");
+        output.Should()
+              .Be("ok:3");
     }
 
     [Fact]
@@ -274,7 +327,8 @@ public class ResultTests
                                    );
 
         //Assert
-        output.Should().Be("err:2");
+        output.Should()
+              .Be("err:2");
     }
 
     [Fact]
@@ -284,8 +338,10 @@ public class ResultTests
         Result combined = ResultExtensions.Combine(Result.Success(), Result.Success(), Result.Success());
 
         //Assert
-        combined.IsSuccess.Should().BeTrue();
-        combined.Errors.Should().BeEmpty();
+        combined.IsSuccess.Should()
+                          .BeTrue();
+        combined.Errors.Should()
+                       .BeEmpty();
     }
 
     [Fact]
@@ -299,14 +355,20 @@ public class ResultTests
                                                   );
 
         //Assert
-        combined.IsFailure.Should().BeTrue();
-        combined.Errors.Should().HaveCount(2);
-        combined.Errors.Should().Contain(SampleError);
-        combined.Errors.Should().Contain(AnotherError);
+        combined.IsFailure.Should()
+                          .BeTrue();
+        combined.Errors.Should()
+                       .HaveCount(2);
+        combined.Errors.Should()
+                       .Contain(SampleError);
+        combined.Errors.Should()
+                       .Contain(AnotherError);
     }
 
-    // ---- Error record ----------------------------------------------------------
+    #endregion
 
+    #region ErrorRecordTests
+    
     [Fact]
     public void Errors_with_identical_fields_are_equal_via_record_semantics()
     {
@@ -315,8 +377,10 @@ public class ResultTests
         Error b = new("code", "msg", EErrorType.NotFound);
 
         //Assert
-        a.Should().Be(b);
-        a.GetHashCode().Should().Be(b.GetHashCode());
+        a.Should()
+         .Be(b);
+        a.GetHashCode().Should()
+                       .Be(b.GetHashCode());
     }
 
     [Fact]
@@ -327,6 +391,9 @@ public class ResultTests
         Error b = new("code", "msg", EErrorType.Conflict);
 
         //Assert
-        a.Should().NotBe(b);
+        a.Should()
+         .NotBe(b);
     }
+
+    #endregion
 }

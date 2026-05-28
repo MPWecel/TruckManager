@@ -4,7 +4,7 @@
 A demo module of an ERP platform - first vertical slice contains a REST API for Truck management. 
 The TruckManager module is an architectural template for potential future modules.
 
->   **Implementation Status:** 
+>   **Implementation Status:** //TODO Update
         Phases 1–5 complete (Solution Skeleton, Shared Kernel, Domain, Persistence, CQRS). 
         Phase 6 (API Layer) starting — REST controllers, ProblemDetails, OpenAPI/Swagger land here. 
         See phases.md for the full roadmap.
@@ -97,7 +97,7 @@ Verify the SDK is picked up correctly inside this directory:
     curl http://localhost:5221/health
     ```
 
-Swagger UI will be at `/swagger` once Phase 6 lands (port 5000 via docker, 5221 via `dotnet run`).
+Swagger UI will be at `/swagger` once Phase 6 lands (port 5000 via docker, 5221 via `dotnet run`).  //TODO Update
 
 ---
 
@@ -105,14 +105,14 @@ Swagger UI will be at `/swagger` once Phase 6 lands (port 5000 via docker, 5221 
     ```bash
     dotnet test solutions/TruckManager.WebApi.sln
     ```
-    As of Phase 5 close: **197 unit + 45 integration tests passing.** ArchitectureTests project is scaffolded but holds no tests yet (lands in Phase 8).
+    As of Phase 6 close: **199 unit + 45 integration tests passing.** ArchitectureTests project is scaffolded but holds no tests yet (lands in Phase 8).    //TODO Update
 
     Three test projects:
-    |   Project                             |   Covers                                                                              |
-    |---------------------------------------|---------------------------------------------------------------------------------------|
-    |   `TruckManager.UnitTests`            |   Domain invariants, value objects, validators, handler logic, pipeline behaviors     |
-    |   `TruckManager.IntegrationTests`     |   Persistence (dual-write, soft-delete, concurrency) + CQRS pipeline smoke tests via Testcontainers Postgres |
-    |   `TruckManager.ArchitectureTests`    |   Layer boundaries, banned APIs (e.g. `DateTime.UtcNow` outside `IDateTimeProvider`) — populated in Phase 8 |
+    |   Project                             |   Covers                                                                                                      |
+    |---------------------------------------|---------------------------------------------------------------------------------------------------------------|
+    |   `TruckManager.UnitTests`            |   Domain invariants, value objects, validators, handler logic, pipeline behaviors                             |
+    |   `TruckManager.IntegrationTests`     |   Persistence (dual-write, soft-delete, concurrency) + CQRS pipeline smoke tests via Testcontainers Postgres  |
+    |   `TruckManager.ArchitectureTests`    |   Layer boundaries, banned APIs (e.g. `DateTime.UtcNow` outside `IDateTimeProvider`) — populated in Phase 8   |
 
 ---
 

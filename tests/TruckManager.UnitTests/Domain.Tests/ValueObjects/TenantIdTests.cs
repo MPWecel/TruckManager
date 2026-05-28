@@ -18,22 +18,27 @@ public class TenantIdTests
         TenantId b = new(guid);
 
         // Assert
-        a.Should().Be(b);
+        a.Should()
+         .Be(b);
 
         int aHashCode = a.GetHashCode();
         int bHashCode = b.GetHashCode();
-        aHashCode.Should().Be(bHashCode);
+        aHashCode.Should()
+                 .Be(bHashCode);
     }
 
     [Fact]
     public void Two_TenantIds_with_different_Guids_are_not_equal()
     {
         //Arrange
-        TenantId a = new(Guid.NewGuid());
-        TenantId b = new(Guid.NewGuid());
+        Guid aId = Guid.NewGuid();
+        Guid bId = Guid.NewGuid();
+        TenantId a = new(aId);
+        TenantId b = new(bId);
 
         // Assert
-        a.Should().NotBe(b);
+        a.Should()
+         .NotBe(b);
     }
 
     [Fact]
@@ -47,14 +52,16 @@ public class TenantIdTests
         TenantId second = TenantId.Default;
 
         //Assert
-        first.Should().BeSameAs(second);
+        first.Should()
+             .BeSameAs(second);
     }
 
     [Fact]
     public void DefaultTenantId_constant_is_a_valid_UUIDv7()
     {
         // Expectation & Explanation:
-        // Version nibble (upper nibble of the 7th byte / 13th hex char of the unhyphenated form) must be 7. The variant nibble (upper nibble of the 9th byte) must be 8, 9, A, or B.
+        // Version nibble (upper nibble of the 7th byte / 13th hex char of the unhyphenated form) must be 7.
+        // The variant nibble (upper nibble of the 9th byte) must be 8, 9, A, or B.
         
         // Arrange
         Guid id = Tenants.DefaultTenantId;
@@ -68,18 +75,22 @@ public class TenantIdTests
         byte[] allowedVariantNibbles = [(byte)(0x8), (byte)(0x9), (byte)(0xA), (byte)(0xB)];
 
         //Assert
-        versionNibble.Should().Be(expectedVersionNibble);
-        variantNibble.Should().BeOneOf(allowedVariantNibbles);
+        versionNibble.Should()
+                     .Be(expectedVersionNibble);
+        variantNibble.Should()
+                     .BeOneOf(allowedVariantNibbles);
     }
 
     [Fact]
     public void TenantId_implements_the_strongly_typed_id_marker_for_Guid()
     {
         // Arrange
-        TenantId id = new(Guid.NewGuid());
+        Guid tId = Guid.NewGuid();
+        TenantId id = new(tId);
 
         // Assert
-        id.Should().BeAssignableTo<IStronglyTypedId<Guid>>();
+        id.Should()
+          .BeAssignableTo<IStronglyTypedId<Guid>>();
     }
 
     [Fact]
@@ -90,6 +101,7 @@ public class TenantIdTests
         TenantId id = new(guid);
 
         // Assert
-        id.Value.Should().Be(guid);
+        id.Value.Should()
+                .Be(guid);
     }
 }
