@@ -2,13 +2,12 @@ using TruckManager.Common.Results;
 
 namespace TruckManager.Domain.ValueObjects;
 
-// Truck description — optional, but always present as a VO (never null on Truck). Empty
-// value (TruckDescription.Empty) represents "no description". Phase 4's EF Core mapping
-// will translate empty ↔ NULL in the nullable `Description` column.
+// Truck description — optional, but always present as a VO (never null on Truck).
+// Empty value (TruckDescription.Empty) represents "no description".
+// Phase 4's EF Core mapping will translate empty ↔ NULL in the nullable `Description` column.
 //
-// Length cap: 512 characters. Control characters rejected; relax via the Rules array if
-// multi-line descriptions are needed (newline / carriage-return / tab are currently
-// blocked — easy to whitelist when the requirement arises).
+// Length cap: 512 characters. Control characters rejected;
+// relax via the Rules array if multi-line descriptions are needed (newline / carriage-return / tab are currently blocked — easy to whitelist when the requirement arises).
 public sealed record TruckDescription
 {
     public const int MaxLength = 512;
@@ -21,10 +20,9 @@ public sealed record TruckDescription
 
     private TruckDescription(string value) => Value = value;
 
-    // [ADR-0032 follow-up / Phase 4 decision #2]   Fast-path for DB-sourced strings that
-    // have already been validated by Create(...) on insert. Used by the EF Core value
-    // converter on load to skip the validator pipeline. Do NOT use for any input
-    // originating outside the persistence boundary — call Create(...) instead.
+    // [ADR-0032 follow-up / Phase 4 decision #2]   Fast-path for DB-sourced strings that have already been validated by Create(...) on insert.
+    // Used by the EF Core value converter on load to skip the validator pipeline.
+    // Do NOT use for any input originating outside the persistence boundary — call Create(...) instead.
     internal static TruckDescription FromTrusted(string value)
     {
         ArgumentNullException.ThrowIfNull(value);

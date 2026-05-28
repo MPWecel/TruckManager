@@ -10,6 +10,7 @@ using TruckManager.Api.Middleware;
 using TruckManager.Api.Swagger;
 using TruckManager.Application;
 using TruckManager.Infrastructure;
+using TruckManager.Infrastructure.Logging;
 using TruckManager.Infrastructure.Workflows;
 
 // Phase 7 / Section A   Bootstrap logger.
@@ -38,7 +39,10 @@ try
                                {
                                    cfg.ReadFrom.Configuration(ctx.Configuration)
                                       .ReadFrom.Services(sp)
-                                      .Enrich.FromLogContext();
+                                      .Enrich.FromLogContext()
+                                      // Phase 7 / Section D   Masks property values whose names match the sensitive-keyword list (password / token / secret / connection-string / cookie / …).
+                                      // Wraps Serilog's default destructurer: returns false when nothing sensitive is present, so the common case has no overhead.
+                                      .Destructure.With<SensitivePropertyDestructuringPolicy>();
 
                                    string? dbConnectionString = ctx.Configuration.GetConnectionString("Default");
                                    if (!String.IsNullOrWhiteSpace(dbConnectionString))

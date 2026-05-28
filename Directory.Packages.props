@@ -2,26 +2,25 @@
 
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <!-- Forces transitive references to honour the pinned versions below. Resolves
-             the EF Core 9.0.1 vs 9.0.16 MSB3277 we hit after adding the Design package
-             to the Api project (a transitive of one of the test packages pulled the
-             older 9.0.1 line). -->
+        <!--	Forces transitive references to honour the pinned versions below. 
+				Resolves the EF Core 9.0.1 vs 9.0.16 MSB3277 we hit after adding the Design package to the Api project (a transitive of one of the test packages pulled the older 9.0.1 line). 
+		-->
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     </PropertyGroup>
 
     <!-- Microsoft / ASP.NET Core 9 -->
-    <!-- Microsoft.AspNetCore.OpenApi (.NET 9 native) pin removed in Phase 6 Section A
-         when the OpenAPI surface switched to Swashbuckle.AspNetCore [next-steps decision #2].
-         Re-add only if a future need for the native OpenAPI generator returns. -->
+    <!-- Microsoft.AspNetCore.OpenApi (.NET 9 native) pin removed in Phase 6 Section A when the OpenAPI surface switched to Swashbuckle.AspNetCore [next-steps decision #2].
+         Re-add only if a future need for the native OpenAPI generator returns. 
+	-->
     <ItemGroup>
         <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.16" />
     </ItemGroup>
 
     <!-- EF Core 9 + Npgsql -->
     <ItemGroup>
-        <!-- Pinned explicitly so CentralPackageTransitivePinningEnabled (above) forces
-             any transitive reference to resolve to 9.0.16. Without this entry, transitive
-             pinning had nothing to pin against and the warning persisted. -->
+        <!-- Pinned explicitly so CentralPackageTransitivePinningEnabled (above) forces any transitive reference to resolve to 9.0.16. 
+			 Without this entry, transitive pinning had nothing to pin against and the warning persisted. 
+		-->
         <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.16" />
         <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.16" />
         <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.16" />
@@ -42,8 +41,8 @@
     </ItemGroup>
 
     <!-- Section G integration tests — building the production DI graph against Testcontainers Postgres.
-         The InMemory configuration provider lives inside Microsoft.Extensions.Configuration (not a
-         separate ".Memory" package — that NuGet id does not exist). -->
+         The InMemory configuration provider lives inside Microsoft.Extensions.Configuration (not a separate ".Memory" package — that NuGet id does not exist). 
+	-->
     <ItemGroup>
         <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.16" />
     </ItemGroup>
@@ -56,6 +55,11 @@
 
     <!-- Logging (Serilog) -->
     <ItemGroup>
+        <!-- Serilog core. 
+				Pinned explicitly so non-Api projects (Infrastructure for the Phase 7 / Section D destructuring policy) can reference 
+				IDestructuringPolicy + friends without pulling the full Serilog.AspNetCore meta-package. 
+		-->
+        <PackageVersion Include="Serilog" Version="4.2.0" />
         <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
         <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
         <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />

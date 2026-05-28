@@ -3,8 +3,7 @@ using TruckManager.Common.Results;
 namespace TruckManager.Domain.ValueObjects;
 
 // Truck display name. Trimmed; non-empty after trim; length 1–128; no control characters.
-// The validator pipeline below makes future rules (e.g. zero-width-char rejection) cheap
-// to add — one new element in the Rules array.
+// The validator pipeline below makes future rules (e.g. zero-width-char rejection) cheap to add — one new element in the Rules array.
 public sealed record TruckName
 {
     public const int MaxLength = 128;
@@ -13,9 +12,8 @@ public sealed record TruckName
 
     private TruckName(string value) => Value = value;
 
-    // [Phase 4 — Persistence]   Fast-path for DB-sourced strings that were validated by
-    // Create(...) on insert. Used by the EF Core value converter on load. Do NOT use for
-    // any input originating outside the persistence boundary — call Create(...) instead.
+    // [Phase 4 — Persistence]   Fast-path for DB-sourced strings that were validated by Create(...) on insert.
+    // Used by the EF Core value converter on load. Do NOT use for any input originating outside the persistence boundary — call Create(...) instead.
     internal static TruckName FromTrusted(string value)
     {
         ArgumentNullException.ThrowIfNull(value);

@@ -23,6 +23,13 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- Phase 7 / Section D   Serilog core types (IDestructuringPolicy, LogEventPropertyValue, etc.) for SensitivePropertyDestructuringPolicy. 
+             The Api project wires the policy into the LoggerConfiguration; Infrastructure just hosts the type. 
+          -->
+        <PackageReference Include="Serilog" />
+    </ItemGroup>
+
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>

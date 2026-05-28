@@ -25,15 +25,15 @@ public sealed class Truck : AggregateRoot<TruckId>
     public ETruckStatus Status { get; private set; }
 
     private Truck(
-                     TruckId           id,
-                     TenantId          tenantId,
-                     ConcurrencyStamp  concurrencyStamp,
-                     DateTimeOffset    createdAtUtc,
-                     Guid              createdByUserId,
-                     TruckCode         code,
-                     TruckName         name,
-                     TruckDescription  description,
-                     ETruckStatus      status
+                     TruckId id,
+                     TenantId tenantId,
+                     ConcurrencyStamp concurrencyStamp,
+                     DateTimeOffset createdAtUtc,
+                     Guid createdByUserId,
+                     TruckCode code,
+                     TruckName name,
+                     TruckDescription description,
+                     ETruckStatus status
                  ) : base(id, tenantId, concurrencyStamp, createdAtUtc, createdByUserId)
     {
         Code = code;
@@ -42,8 +42,7 @@ public sealed class Truck : AggregateRoot<TruckId>
         Status = status;
     }
 
-    // EF Core materialization constructor — see Domain/Common/BaseEntity.cs. NEVER invoke
-    // from Domain code; the factory Create(...) is the only public construction path.
+    // EF Core materialization constructor — see Domain/Common/BaseEntity.cs. NEVER invoke from Domain code; the factory Create(...) is the only public construction path.
     private Truck() : base()
     {
         Code        = default!;
@@ -52,9 +51,7 @@ public sealed class Truck : AggregateRoot<TruckId>
         Status      = default;
     }
 
-    // ----------------------------------------------------------------------------------
-    // Factory
-    // ----------------------------------------------------------------------------------
+    // Factory method
 
     public static Result<Truck> Create(
                                           TruckId id, 
@@ -111,12 +108,9 @@ public sealed class Truck : AggregateRoot<TruckId>
         return Result<Truck>.Success(truck);
     }
 
-    // ----------------------------------------------------------------------------------
     // Mutations
-    // ----------------------------------------------------------------------------------
 
-    // [ADR-0026]   Unified update. Raises 0, 1, or 2 events based on what actually
-    // changed; all share the same AggregateVersion and one ConcurrencyStamp increment.
+    // [ADR-0026]   Unified update. Raises 0, 1, or 2 events based on what actually changed; all share the same AggregateVersion and one ConcurrencyStamp increment.
     // No-op (no field changed) → Result.Success with NO event and NO stamp increment.
     public Result Update( TruckUpdates updates, IDateTimeProvider clock, Guid updatedByUserId, Guid? correlationId = null)
     {
@@ -130,8 +124,9 @@ public sealed class Truck : AggregateRoot<TruckId>
                            !Name.Equals(updates.Name);
         bool descChanged = updates.Description is not null && 
                            !Description.Equals(updates.Description);
+        bool noChanges = !nameChanged && !descChanged;
 
-        if (!nameChanged && !descChanged)
+        if (noChanges)
             return Result.Success();
 
         TruckName oldName = Name;
@@ -300,9 +295,7 @@ public sealed class Truck : AggregateRoot<TruckId>
         return Result.Success();
     }
 
-    // ----------------------------------------------------------------------------------
-    // Helpers
-    // ----------------------------------------------------------------------------------
+    #region Helpers
 
     // Single point that bumps ConcurrencyStamp + audit fields. ApplyMutation is the ONLY way to advance the version inside Truck — guarantees one stamp increment per logical mutation [ADR-0026].
     // Returns the `now` it sourced so callers can reuse it for event timestamps without re-reading the clock.
@@ -321,4 +314,6 @@ public sealed class Truck : AggregateRoot<TruckId>
                   Message: $"Cannot {operation} a deleted Truck.",
                   Type: EErrorType.Conflict
               );
+    #endregion
+
 }
