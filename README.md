@@ -7,7 +7,7 @@ The TruckManager module is an architectural template for potential future module
 >   **Implementation Status:** 
         Phases 1–5 complete (Solution Skeleton, Shared Kernel, Domain, Persistence, CQRS). 
         Phase 6 (API Layer) starting — REST controllers, ProblemDetails, OpenAPI/Swagger land here. 
-        See [`.claude/docs/phases.md`](../.claude/docs/phases.md) for the full roadmap.
+        See phases.md for the full roadmap.
 
 ---
 
