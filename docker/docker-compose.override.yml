@@ -1,5 +1,4 @@
-# Local-dev overlay. Auto-merged by `docker compose` when both files are passed via -f,
-# or when compose is invoked from this directory.
+# Local-dev overlay. Auto-merged by `docker compose` when both files are passed via -f, or when compose is invoked from this directory.
 
 services:
 
@@ -11,9 +10,14 @@ services:
   api:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      # TODO (Phase 7): Serilog override levels via env vars. Category names contain
-      # dots (e.g. Microsoft.Hosting.Lifetime), so use the LIST form of `environment:`
-      # or quoted keys — `__` is the section separator, dots stay literal.
+      # Phase 7 / Section A   Serilog level overrides via env vars.
+      # `__` is the ASP.NET Core configuration-key separator; dots inside category names stay literal (e.g. `Microsoft.AspNetCore`). 
+      # Compose's map-form `environment:` accepts the dotted keys without YAML quoting because the dot isn't a YAML special character.
+      # Uncomment + adjust any of the lines below to override appsettings.json `Serilog` values at container start without rebuilding the image:
+      # Serilog__MinimumLevel__Default: Debug
+      # Serilog__MinimumLevel__Override__Microsoft.AspNetCore: Information
+      # Serilog__MinimumLevel__Override__Microsoft.EntityFrameworkCore: Information
+      # Serilog__MinimumLevel__Override__TruckManager: Verbose
     ports:
       # Host:Container. Container listens on 8080 (set by the aspnet:9.0 base image).
       - "5000:8080"

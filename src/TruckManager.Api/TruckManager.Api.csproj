@@ -20,6 +20,17 @@
     </ItemGroup>
 
     <ItemGroup>
+        <!-- Phase 7: Serilog framework + sinks [ADR-0012, ADR-0021]. 
+             Console + File configured via appsettings.json `Serilog` section; 
+             PostgreSQL.Alternative sink wired in Program.cs reading the connection string from IConfiguration.ConnectionStrings:Default. 
+          -->
+        <PackageReference Include="Serilog.AspNetCore" />
+        <PackageReference Include="Serilog.Sinks.Console" />
+        <PackageReference Include="Serilog.Sinks.File" />
+        <PackageReference Include="Serilog.Sinks.Postgresql.Alternative" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\TruckManager.Common\TruckManager.Common.csproj" />
         <ProjectReference Include="..\TruckManager.Application\TruckManager.Application.csproj" />
         <ProjectReference Include="..\TruckManager.Infrastructure\TruckManager.Infrastructure.csproj" />
