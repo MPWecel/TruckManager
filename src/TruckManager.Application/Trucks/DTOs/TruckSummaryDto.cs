@@ -14,7 +14,7 @@ public sealed record TruckSummaryDto(
                                     )
 {
     // EF-translatable projection — use via IQueryable<Truck>.Select(TruckSummaryDto.Projection).
-    // Only the columns needed for list views are selected.  [Phase 5 decision #6]
+    // Only the columns needed for list views are selected. See architecture.md §19.4 + ADR-0040.
     public static readonly Expression<Func<Truck, TruckSummaryDto>> Projection = 
         truck => new TruckSummaryDto(
                                         truck.Id.Value,

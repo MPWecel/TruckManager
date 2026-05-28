@@ -22,7 +22,7 @@ public sealed record TruckDto(
                              )
 {
     // EF-translatable projection — use via IQueryable<Truck>.Select(TruckDto.Projection).
-    // VO property accesses (.Value, .IsEmpty) are resolved by EF Core's result materializer on the client after the SQL query; the column set, filtering, and paging all stay server-side.  [Phase 5 decision #6]
+    // VO property accesses (.Value, .IsEmpty) are resolved by EF Core's result materializer on the client after the SQL query; the column set, filtering, and paging all stay server-side. See architecture.md §19.4 + ADR-0040.
     public static readonly Expression<Func<Truck, TruckDto>> Projection = 
         truck => new TruckDto(
                                  truck.Id.Value,
