@@ -6,9 +6,8 @@ namespace TruckManager.Application.Abstractions.Cqrs;
 // Callers inject this and call SendAsync(command); Dispatcher resolves the matching ICommandHandler<> from DI and composes registered IPipelineBehavior<> layers (including UnitOfWorkBehavior per [ADR-0039]) around it.
 //
 // Two overloads:
-//   > SendAsync(ICommand, ct):     resultless command, returns Result;
+//   > SendAsync(ICommand, ct):                     resultless command, returns Result;
 //   > SendAsync<TResult>(ICommand<TResult>,ct):    payload-returning command;
-//
 // Implementations in TruckManager.Application.Cqrs.CommandDispatcher.
 public interface ICommandDispatcher
 {

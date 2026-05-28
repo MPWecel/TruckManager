@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 
-using TruckManager.Application.Abstractions.Cqrs;
 using TruckManager.Common.Results;
+using TruckManager.Application.Abstractions.Cqrs;
 
 namespace TruckManager.Application.Cqrs;
 
@@ -9,10 +9,8 @@ namespace TruckManager.Application.Cqrs;
 //
 // For each SendAsync call:
 //   1. Close the ICommandHandler<> generic over the runtime command type (and TResult).
-//   2. Close the IPipelineBehavior<,> generic over the same types and resolve the
-//      registered behaviors as IEnumerable<>.
-//   3. Compose the behaviors in reverse-registration order around the handler call —
-//      first registered runs outermost, last registered is closest to the handler.
+//   2. Close the IPipelineBehavior<,> generic over the same types and resolve the registered behaviors as IEnumerable<>.
+//   3. Compose the behaviors in reverse-registration order around the handler call — first registered runs outermost, last registered is closest to the handler.
 //   4. Invoke the resulting Func<Task<TResult>>.
 //
 // 'dynamic' casts bridge "generic interface, runtime-known type parameters": language can't statically type this without reflection. Reflection is expensive. 'dynamic' is ugly. Ugly >>> expensive.
@@ -24,6 +22,7 @@ public sealed class CommandDispatcher : ICommandDispatcher
     public CommandDispatcher(IServiceProvider services)
     {
         ArgumentNullException.ThrowIfNull(services);
+        
         _services = services;
     }
 

@@ -3,10 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using TruckManager.Application.Abstractions;
-using TruckManager.Application.Abstractions.Persistence;
 using TruckManager.Common.Abstractions;
 using TruckManager.Domain.Policies;
+using TruckManager.Application.Abstractions;
+using TruckManager.Application.Abstractions.Persistence;
 using TruckManager.Infrastructure.Auth;
 using TruckManager.Infrastructure.Http;
 using TruckManager.Infrastructure.Persistence;
@@ -21,10 +21,10 @@ namespace TruckManager.Infrastructure;
 // Api/Program.cs just calls AddTruckManagerInfrastructure(builder.Configuration) and wires the health-check endpoint on top.
 //
 // Lifetime choices:
-//   > 'IDateTimeProvider', 'IDomainEventSerializer', 'TruckStatusTransitionPolicy', 'StatusBijectionHealthCheck', 'DomainEventPersistenceInterceptor'  ->  Singleton (stateless or designed to be load-once).
-//   > 'ICurrentUserService'    ->  Scoped (Phase 9 will read per-request HttpContext claims).
-//   > 'CreatedAuditFillerInterceptor'  ->  Scoped (depends on scoped ICurrentUserService).
-//   > 'ApplicationDbContext'   ->  Scoped (standard EF Core lifetime).
+//   >  'IDateTimeProvider', 'IDomainEventSerializer', 'TruckStatusTransitionPolicy', 'StatusBijectionHealthCheck', 'DomainEventPersistenceInterceptor'  ->  Singleton (stateless or designed to be load-once).
+//   >  'ICurrentUserService'    ->  Scoped (Phase 9 will read per-request HttpContext claims).
+//   >  'CreatedAuditFillerInterceptor'  ->  Scoped (depends on scoped ICurrentUserService).
+//   >  'ApplicationDbContext'   ->  Scoped (standard EF Core lifetime).
 //
 // Hosted-service ordering matters (executes in registration order):
 //   1. 'MigrationRunner'   ->  creates / updates tables.
@@ -55,7 +55,7 @@ public static class DependencyInjection
         services.AddScoped<ICorrelationContext, HttpContextCorrelationContext>();
 
         // ------------------------------------------------------------------------------
-        // Domain-event serialization (ADR-0030)
+        // Domain-event serialization [ADR-0030]
         // ------------------------------------------------------------------------------
 
         services.AddSingleton<IDomainEventSerializer, DomainEventSerializer>();
@@ -70,8 +70,7 @@ public static class DependencyInjection
         services.AddSingleton<TruckStatusTransitionPolicy>()
                 .AddSingleton<ITruckStatusTransitionPolicy>(sp => sp.GetRequiredService<TruckStatusTransitionPolicy>());
 
-        // Same proxy pattern for StatusBijectionHealthCheck — one singleton serves both the IHostedService entry (below) and the IHealthCheck registration that
-        // Api/Program.cs wires via AddHealthChecks().AddCheck<StatusBijectionHealthCheck>(...).
+        // Same proxy pattern for StatusBijectionHealthCheck — one singleton serves both the IHostedService entry (below) and the IHealthCheck registration that Api/Program.cs wires via AddHealthChecks().AddCheck<StatusBijectionHealthCheck>(...).
         services.AddSingleton<StatusBijectionHealthCheck>();
 
         // ------------------------------------------------------------------------------

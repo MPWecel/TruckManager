@@ -17,18 +17,21 @@ public sealed class ChangeTruckStatusHandler : ICommandHandler<ChangeTruckStatus
     private readonly ITruckStatusTransitionPolicy _policy;
     private readonly ICurrentUserService _currentUser;
     private readonly IDateTimeProvider _clock;
+    private readonly ICorrelationContext _correlation;
 
-    public ChangeTruckStatusHandler(IApplicationDbContext ctx, ITruckStatusTransitionPolicy policy, ICurrentUserService currentUser, IDateTimeProvider clock)
+    public ChangeTruckStatusHandler(IApplicationDbContext ctx, ITruckStatusTransitionPolicy policy, ICurrentUserService currentUser, IDateTimeProvider clock, ICorrelationContext correlation)
     {
         ArgumentNullException.ThrowIfNull(ctx);
         ArgumentNullException.ThrowIfNull(policy);
         ArgumentNullException.ThrowIfNull(currentUser);
         ArgumentNullException.ThrowIfNull(clock);
+        ArgumentNullException.ThrowIfNull(correlation);
 
-        _ctx         = ctx;
-        _policy      = policy;
+        _ctx = ctx;
+        _policy = policy;
         _currentUser = currentUser;
-        _clock       = clock;
+        _clock = clock;
+        _correlation = correlation;
     }
 
     public async Task<Result> HandleAsync(ChangeTruckStatusCommand command, CancellationToken cancellationToken)
@@ -42,7 +45,7 @@ public sealed class ChangeTruckStatusHandler : ICommandHandler<ChangeTruckStatus
             return Result.Failure(NotFound(command.TruckId));
 
         Guid userId = _currentUser.UserId ?? Guid.Empty;
-        return truck.ChangeStatus(command.NewStatus, _policy, _clock, userId);
+        return truck.ChangeStatus(command.NewStatus, _policy, _clock, userId, correlationId: _correlation.CorrelationId);
     }
 
     private static Error NotFound(Guid id) => new("truck.not_found", $"Truck {id} was not found.", EErrorType.NotFound);

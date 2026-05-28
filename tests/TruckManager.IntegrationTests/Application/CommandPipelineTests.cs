@@ -7,6 +7,7 @@ using TruckManager.Common.Results;
 using TruckManager.Domain.Aggregates.Trucks;
 using TruckManager.Domain.Enums;
 using TruckManager.Domain.ValueObjects;
+using TruckManager.Application.Abstractions;
 using TruckManager.Application.Abstractions.Cqrs;
 using TruckManager.Application.Trucks.Commands.ChangeTruckStatus;
 using TruckManager.Application.Trucks.Commands.CreateTruck;
@@ -77,13 +78,19 @@ public sealed class CommandPipelineTests(PostgresFixture fixture) : IClassFixtur
 
         // Assert — TruckCreated event row written in the same transaction
         int eventCount = await ctx.TruckDomainEvents.CountAsync(e => e.AggregateId == truckId);
-        
+
         eventCount.Should()
                   .Be(1);
-        
-        ctx.TruckDomainEvents.Single(e => e.AggregateId == truckId)
-                             .EventType.Should()
-                                       .Contain("TruckCreated");
+
+        TruckManager.Infrastructure.Persistence.Entities.TruckDomainEvent eventRow = ctx.TruckDomainEvents.Single(e => e.AggregateId == truckId);
+        eventRow.EventType.Should()
+                          .Contain("TruckCreated");
+
+        // Phase 7 / Section E   The CorrelationId is plumbed from the scope's ICorrelationContext (the test
+        // fake registered in PostgresFixture) through the handler → aggregate → raised event → DB row.
+        ICorrelationContext correlation = scope.ServiceProvider.GetRequiredService<ICorrelationContext>();
+        eventRow.CorrelationId.Should()
+                              .Be(correlation.CorrelationId);
     }
 
     [Fact]

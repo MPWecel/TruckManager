@@ -1,10 +1,10 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 
-using TruckManager.Application.Abstractions.Persistence;
 using TruckManager.Common.Abstractions;
 using TruckManager.Domain.Aggregates.Trucks;
 using TruckManager.Domain.ValueObjects;
+using TruckManager.Application.Abstractions.Persistence;
 using TruckManager.Infrastructure.Persistence.Conversions;
 using TruckManager.Infrastructure.Persistence.Entities;
 

@@ -32,7 +32,7 @@ public class ChangeTruckStatusHandlerTests
         Guid truckId = ctx.Trucks.First().Id.Value;
 
         var policy = FakeTruckStatusTransitionPolicy.WithDefaultWorkflow();
-        ChangeTruckStatusHandler handler = new(ctx, policy, FakeCurrentUserService.Anonymous(), clock);
+        ChangeTruckStatusHandler handler = new(ctx, policy, FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
         ChangeTruckStatusCommand command = new(truckId, ETruckStatus.Loading);
 
         // Act
@@ -51,7 +51,7 @@ public class ChangeTruckStatusHandlerTests
         using ApplicationDbContext ctx = TestDbContextFactory.Create();
         FakeDateTimeProvider clock = new(T0);
 
-        ChangeTruckStatusHandler handler = new(ctx, FakeTruckStatusTransitionPolicy.AllowEverything(), FakeCurrentUserService.Anonymous(), clock);
+        ChangeTruckStatusHandler handler = new(ctx, FakeTruckStatusTransitionPolicy.AllowEverything(), FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
         ChangeTruckStatusCommand command = new(Guid.NewGuid(), ETruckStatus.Loading);
 
         // Act
@@ -80,7 +80,7 @@ public class ChangeTruckStatusHandlerTests
         using ApplicationDbContext ctx = TestDbContextFactory.Create(dbName);
         Guid truckId = ctx.Trucks.First().Id.Value;
 
-        ChangeTruckStatusHandler handler = new(ctx, FakeTruckStatusTransitionPolicy.DenyAll(), FakeCurrentUserService.Anonymous(), clock);
+        ChangeTruckStatusHandler handler = new(ctx, FakeTruckStatusTransitionPolicy.DenyAll(), FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
         ChangeTruckStatusCommand command = new(truckId, ETruckStatus.AtJob);
 
         // Act

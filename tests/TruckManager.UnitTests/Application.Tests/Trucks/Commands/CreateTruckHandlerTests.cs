@@ -2,6 +2,7 @@ using AwesomeAssertions;
 using Xunit;
 
 using TruckManager.Common.Results;
+using TruckManager.Domain.Aggregates.Trucks;
 using TruckManager.Domain.Enums;
 using TruckManager.Domain.ValueObjects;
 using TruckManager.Application.Trucks.Commands.CreateTruck;
@@ -15,10 +16,10 @@ public class CreateTruckHandlerTests
     private static readonly DateTimeOffset T0 = new(2026, 5, 13, 13, 37, 0, TimeSpan.Zero);
 
     private static CreateTruckHandler BuildHandler()
-        => new(TestDbContextFactory.Create(), FakeCurrentUserService.Anonymous(), new FakeDateTimeProvider(T0));
+        => new(TestDbContextFactory.Create(), FakeCurrentUserService.Anonymous(), new FakeDateTimeProvider(T0), new FakeCorrelationContext());
 
     private static CreateTruckHandler BuildHandlerForDb(ApplicationDbContext ctx, FakeDateTimeProvider clock)
-        => new(ctx, FakeCurrentUserService.Anonymous(), clock);
+        => new(ctx, FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
 
     // ---- Happy path -------------------------------------------------------
 
@@ -210,5 +211,42 @@ public class CreateTruckHandlerTests
 
         secondResult.IsSuccess.Should()
                               .BeTrue();
+    }
+
+    // ---- Phase 7 / Section E   CorrelationId plumbing ----------------------------------
+
+    [Fact]
+    public async Task HandleAsync_stamps_CorrelationId_from_ICorrelationContext_onto_raised_event()
+    {
+        // Arrange — use a deterministic correlation id so we can compare it on the raised event.
+        Guid                    expectedCorrelationId   = Guid.NewGuid();
+        FakeDateTimeProvider    clock                   = new(T0);
+        FakeCorrelationContext  correlation             = FakeCorrelationContext.WithId(expectedCorrelationId);
+
+        using ApplicationDbContext ctx = TestDbContextFactory.Create();
+        CreateTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock, correlation);
+        CreateTruckCommand command = new(
+                                            TenantId:      Guid.NewGuid(),
+                                            Code:          "CORR01",
+                                            Name:          "Correlated truck",
+                                            Description:   null,
+                                            InitialStatus: ETruckStatus.OutOfService
+                                        );
+
+        // Act
+        Result<TruckId> result = await handler.HandleAsync(command, TestContext.Current.CancellationToken);
+
+        // Assert — handler succeeded.
+        result.IsSuccess.Should()
+                        .BeTrue();
+
+        // Assert — the TruckCreated domain event raised by the aggregate carries the same CorrelationId.
+        // Unit tests don't wire the DomainEventPersistenceInterceptor, so the event is still in
+        // the aggregate's DomainEvents queue after the handler returns — perfect for assertion.
+        Truck truck = ctx.Trucks.Local.Single();
+        truck.DomainEvents.Should()
+                          .ContainSingle()
+                          .Which.CorrelationId.Should()
+                                              .Be(expectedCorrelationId);
     }
 }

@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Testcontainers.PostgreSql;
 using Xunit;
 
 using TruckManager.Application;
+using TruckManager.Application.Abstractions;
 using TruckManager.Infrastructure;
 using TruckManager.Infrastructure.Persistence;
 using TruckManager.Infrastructure.Workflows;
@@ -80,6 +82,14 @@ public sealed class PostgresFixture : IAsyncLifetime
         
         services.AddTruckManagerApplication()
                 .AddTruckManagerInfrastructure(configuration);
+
+        // Phase 7 / Section E   Replace the HttpContext-backed ICorrelationContext with a per-scope fake.
+        // Integration tests dispatch commands directly via ICommandDispatcher — they never run inside an
+        // HTTP request scope, so HttpContext.Items["TruckManager.CorrelationId"] is never set and the
+        // production HttpContextCorrelationContext would throw. The fake returns a stable Guid per scope,
+        // which is what tests assert against on the persisted TruckDomainEvents.CorrelationId.
+        services.RemoveAll<ICorrelationContext>();
+        services.AddScoped<ICorrelationContext, FakeCorrelationContext>();
 
         return services.BuildServiceProvider();
     }

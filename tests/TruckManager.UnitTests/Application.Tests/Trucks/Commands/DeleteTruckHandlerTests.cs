@@ -38,7 +38,7 @@ public class DeleteTruckHandlerTests
                           .Id
                           .Value;
 
-        DeleteTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock);
+        DeleteTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
         DeleteTruckCommand command = new(truckId);
 
         // Act
@@ -57,7 +57,7 @@ public class DeleteTruckHandlerTests
         using ApplicationDbContext ctx = TestDbContextFactory.Create();
         FakeDateTimeProvider clock = new(T0);
 
-        DeleteTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock);
+        DeleteTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
         DeleteTruckCommand command = new(Guid.NewGuid());
 
         // Act
@@ -87,7 +87,7 @@ public class DeleteTruckHandlerTests
         using ApplicationDbContext ctx = TestDbContextFactory.Create(dbName);
         Guid truckId = ctx.Trucks.IgnoreQueryFilters().First().Id.Value;
 
-        DeleteTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock);
+        DeleteTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
         DeleteTruckCommand command = new(truckId);
 
         // Act

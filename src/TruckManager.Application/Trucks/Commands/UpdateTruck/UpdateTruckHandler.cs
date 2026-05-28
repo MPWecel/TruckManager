@@ -15,16 +15,19 @@ public sealed class UpdateTruckHandler : ICommandHandler<UpdateTruckCommand>
     private readonly IApplicationDbContext _ctx;
     private readonly ICurrentUserService _currentUser;
     private readonly IDateTimeProvider _clock;
+    private readonly ICorrelationContext _correlation;
 
-    public UpdateTruckHandler(IApplicationDbContext ctx, ICurrentUserService currentUser, IDateTimeProvider clock)
+    public UpdateTruckHandler(IApplicationDbContext ctx, ICurrentUserService currentUser, IDateTimeProvider clock, ICorrelationContext correlation)
     {
         ArgumentNullException.ThrowIfNull(ctx);
         ArgumentNullException.ThrowIfNull(currentUser);
         ArgumentNullException.ThrowIfNull(clock);
+        ArgumentNullException.ThrowIfNull(correlation);
 
-        _ctx         = ctx;
+        _ctx = ctx;
         _currentUser = currentUser;
-        _clock       = clock;
+        _clock = clock;
+        _correlation = correlation;
     }
 
     public async Task<Result> HandleAsync(UpdateTruckCommand command, CancellationToken cancellationToken)
@@ -58,7 +61,7 @@ public sealed class UpdateTruckHandler : ICommandHandler<UpdateTruckCommand>
         }
 
         Guid userId = _currentUser.UserId ?? Guid.Empty;
-        return truck.Update(new TruckUpdates(newName, newDesc), _clock, userId);
+        return truck.Update(new TruckUpdates(newName, newDesc), _clock, userId, correlationId: _correlation.CorrelationId);
     }
 
     private static Error NotFound(Guid id) => new("truck.not_found", $"Truck {id} was not found.", EErrorType.NotFound);

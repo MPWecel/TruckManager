@@ -38,7 +38,7 @@ public class UpdateTruckHandlerTests
                           .Id
                           .Value;
 
-        UpdateTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock);
+        UpdateTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
         UpdateTruckCommand command = new(truckId, Name: "Updated Name", Description: null);
 
         // Act
@@ -70,7 +70,7 @@ public class UpdateTruckHandlerTests
                           .Id
                           .Value;
 
-        UpdateTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock);
+        UpdateTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
         // Same name — aggregate returns Success with no mutation
         UpdateTruckCommand command = new(truckId, Name: "Stable Name", Description: null);
 
@@ -91,7 +91,7 @@ public class UpdateTruckHandlerTests
         using ApplicationDbContext ctx = TestDbContextFactory.Create();
         FakeDateTimeProvider clock = new(T0);
 
-        UpdateTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock);
+        UpdateTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
         UpdateTruckCommand command = new(Guid.NewGuid(), Name: "Any", Description: null);
 
         // Act
@@ -131,7 +131,7 @@ public class UpdateTruckHandlerTests
                           .Id
                           .Value;
 
-        UpdateTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock);
+        UpdateTruckHandler handler = new(ctx, FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
         UpdateTruckCommand command = new(truckId, Name: "Should Fail", Description: null);
 
         // Act

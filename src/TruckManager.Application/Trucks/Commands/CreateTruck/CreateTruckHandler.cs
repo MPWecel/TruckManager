@@ -15,16 +15,24 @@ public sealed class CreateTruckHandler : ICommandHandler<CreateTruckCommand, Res
     private readonly IApplicationDbContext _ctx;
     private readonly ICurrentUserService _currentUser;
     private readonly IDateTimeProvider _clock;
+    private readonly ICorrelationContext _correlation;
 
-    public CreateTruckHandler(IApplicationDbContext ctx, ICurrentUserService currentUser, IDateTimeProvider clock)
+    public CreateTruckHandler(
+                                 IApplicationDbContext ctx,
+                                 ICurrentUserService currentUser,
+                                 IDateTimeProvider clock,
+                                 ICorrelationContext correlation
+                             )
     {
         ArgumentNullException.ThrowIfNull(ctx);
         ArgumentNullException.ThrowIfNull(currentUser);
         ArgumentNullException.ThrowIfNull(clock);
+        ArgumentNullException.ThrowIfNull(correlation);
 
-        _ctx         = ctx;
+        _ctx = ctx;
         _currentUser = currentUser;
-        _clock       = clock;
+        _clock = clock;
+        _correlation = correlation;
     }
 
     public async Task<Result<TruckId>> HandleAsync(CreateTruckCommand command, CancellationToken cancellationToken)
@@ -77,7 +85,8 @@ public sealed class CreateTruckHandler : ICommandHandler<CreateTruckCommand, Res
                                                     description: descResult.Value!,
                                                     initialStatus: command.InitialStatus,
                                                     clock: _clock,
-                                                    createdByUserId: userId
+                                                    createdByUserId: userId,
+                                                    correlationId: _correlation.CorrelationId
                                                 );
 
         if (!truckResult.IsSuccess)
