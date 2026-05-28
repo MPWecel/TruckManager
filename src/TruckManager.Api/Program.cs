@@ -180,3 +180,10 @@ finally
     // Phase 7 / Section A   Flush + dispose Serilog on shutdown so any buffered log lines (especially the File and PostgreSQL sinks, which batch writes) reach their destinations before the process exits.
     Log.CloseAndFlush();
 }
+
+#region ProgramExposureForTests
+// Phase 8 / Section F.   Make the implicit top-level Program class addressable as `typeof(Program)` for WebApplicationFactory<Program>.
+// Without this declaration the auto-generated Program is internal, and the architecture tests + Web API integration tests in TruckManager.IntegrationTests can't reference it.
+// `partial` matches the compiler-emitted class signature; the empty body just elevates visibility.
+public partial class Program;
+#endregion
