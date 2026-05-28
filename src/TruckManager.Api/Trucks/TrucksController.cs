@@ -42,7 +42,7 @@ public sealed class TrucksController : ControllerBase
         _queries    = queries;
     }
 
-    // ---- Commands ---------------------------------------------------------------------
+    #region Commands
 
     // POST /api/v1/trucks
     [HttpPost]
@@ -125,7 +125,9 @@ public sealed class TrucksController : ControllerBase
         return result.ToNoContentResult();
     }
 
-    // ---- Queries ----------------------------------------------------------------------
+    #endregion
+
+    #region Queries
 
     // GET /api/v1/trucks?page=1&pageSize=50&status=2
     [HttpGet]
@@ -157,4 +159,6 @@ public sealed class TrucksController : ControllerBase
 
         return result.ToOkResult();
     }
+
+    #endregion
 }

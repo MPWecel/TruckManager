@@ -15,7 +15,7 @@ public class ListTrucksHandlerTests
 {
     private static readonly DateTimeOffset T0 = new(2026, 5, 13, 13, 37, 0, TimeSpan.Zero);
 
-    // ---- Happy path -------------------------------------------------------
+    // Happy path
 
     [Fact]
     public async Task HandleAsync_returns_Success_with_empty_page_when_no_trucks()

@@ -16,7 +16,7 @@ public class GetTruckByIdHandlerTests
 {
     private static readonly DateTimeOffset T0 = new(2026, 5, 13, 13, 37, 0, TimeSpan.Zero);
 
-    // ---- Happy path -------------------------------------------------------
+    //Happy path
 
     [Fact]
     public async Task HandleAsync_returns_Success_with_correct_DTO_when_truck_exists()
@@ -62,7 +62,7 @@ public class GetTruckByIdHandlerTests
                               .BeFalse();
     }
 
-    // ---- Failure paths ----------------------------------------------------
+    //Failure paths
 
     [Fact]
     public async Task HandleAsync_returns_NotFound_when_truck_does_not_exist()

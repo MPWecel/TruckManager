@@ -5,9 +5,9 @@
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
         <!-- xUnit1051: prefer TestContext.Current.CancellationToken on async calls.
-             Suppressed project-wide for V1 — the Phase 4 integration suite has dozens of
-             EF Core async calls and the verbosity gain isn't worth the test-cancellation
-             responsiveness benefit at this scale. Possible Phase 8 follow-up. -->
+             Suppressed project-wide for V1 — the Phase 4 integration suite has dozens of EF Core async calls and the verbosity gain isn't worth the test-cancellation responsiveness benefit at this scale. 
+             Possible Phase 8 follow-up. 
+          -->
         <NoWarn>$(NoWarn);xUnit1051</NoWarn>
     </PropertyGroup>
 

@@ -1,7 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using AwesomeAssertions;
 using Xunit;
 
-using Microsoft.EntityFrameworkCore;
 
 using TruckManager.Common.Results;
 using TruckManager.Domain.Enums;
@@ -15,7 +15,7 @@ public class UpdateTruckHandlerTests
 {
     private static readonly DateTimeOffset T0 = new(2026, 5, 13, 13, 37, 0, TimeSpan.Zero);
 
-    // ---- Happy path -------------------------------------------------------
+    // Happy path
 
     [Fact]
     public async Task HandleAsync_returns_Success_when_truck_exists_and_name_is_updated()
@@ -82,7 +82,7 @@ public class UpdateTruckHandlerTests
                         .BeTrue();
     }
 
-    // ---- Failure paths ----------------------------------------------------
+    // Failure paths 
 
     [Fact]
     public async Task HandleAsync_returns_NotFound_when_truck_does_not_exist()

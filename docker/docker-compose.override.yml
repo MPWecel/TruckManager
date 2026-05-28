@@ -17,7 +17,11 @@ services:
       # Serilog__MinimumLevel__Default: Debug
       # Serilog__MinimumLevel__Override__Microsoft.AspNetCore: Information
       # Serilog__MinimumLevel__Override__Microsoft.EntityFrameworkCore: Information
-      # Serilog__MinimumLevel__Override__TruckManager: Verbose
+      # Phase 7 / Section H smoke fix — verify-time override so `LoggingBehavior` Debug-level `{RequestType} starting` lines reach Console + File + Logs.
+      # In production runs you'd typically leave this at Information; the `TruckManager` prefix matches all categories in our codebase.
+      Serilog__MinimumLevel__Override__TruckManager: Debug
+      Serilog__MinimumLevel__Override__Microsoft.AspNetCore: Debug
+      Serilog__MinimumLevel__Override__Microsoft.EntityFrameworkCore: Debug
     ports:
       # Host:Container. Container listens on 8080 (set by the aspnet:9.0 base image).
       - "5000:8080"

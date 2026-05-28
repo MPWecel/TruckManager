@@ -8,9 +8,9 @@
         <!-- Phase 6: API versioning via URL segment (`/api/v{version}/...`) [decision #1]. -->
         <PackageReference Include="Asp.Versioning.Mvc" />
         <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
-        <!-- Phase 6: OpenAPI / Swagger UI [decision #2]. Replaces the .NET 9 native
-             Microsoft.AspNetCore.OpenApi scaffold (which had no Swagger UI and weaker
-             Asp.Versioning integration). -->
+        <!-- Phase 6: OpenAPI / Swagger UI [decision #2]. Replaces the .NET 9 native Microsoft.AspNetCore.OpenApi scaffold 
+             (which had no Swagger UI and weaker Asp.Versioning integration). 
+          -->
         <PackageReference Include="Swashbuckle.AspNetCore" />
         <!-- Design-time only: enables `dotnet ef migrations add` / `dotnet ef database update`. -->
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
@@ -21,8 +21,7 @@
 
     <ItemGroup>
         <!-- Phase 7: Serilog framework + sinks [ADR-0012, ADR-0021]. 
-             Console + File configured via appsettings.json `Serilog` section; 
-             PostgreSQL.Alternative sink wired in Program.cs reading the connection string from IConfiguration.ConnectionStrings:Default. 
+             Console + File configured via appsettings.json `Serilog` section; PostgreSQL.Alternative sink wired in Program.cs reading the connection string from IConfiguration.ConnectionStrings:Default. 
           -->
         <PackageReference Include="Serilog.AspNetCore" />
         <PackageReference Include="Serilog.Sinks.Console" />

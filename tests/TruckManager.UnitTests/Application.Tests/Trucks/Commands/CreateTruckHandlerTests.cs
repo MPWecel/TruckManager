@@ -21,7 +21,7 @@ public class CreateTruckHandlerTests
     private static CreateTruckHandler BuildHandlerForDb(ApplicationDbContext ctx, FakeDateTimeProvider clock)
         => new(ctx, FakeCurrentUserService.Anonymous(), clock, new FakeCorrelationContext());
 
-    // ---- Happy path -------------------------------------------------------
+    // Happy path
 
     [Fact]
     public async Task HandleAsync_returns_Success_with_a_non_empty_TruckId_for_valid_inputs()
@@ -69,7 +69,7 @@ public class CreateTruckHandlerTests
                         .BeTrue();
     }
 
-    // ---- Failure paths ----------------------------------------------------
+    //Failure paths
 
     [Fact]
     public async Task HandleAsync_returns_Failure_when_code_contains_invalid_characters()

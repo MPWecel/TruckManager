@@ -1,7 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using AwesomeAssertions;
 using Xunit;
-
-using Microsoft.EntityFrameworkCore;
 
 using TruckManager.Common.Results;
 using TruckManager.Domain.Enums;
