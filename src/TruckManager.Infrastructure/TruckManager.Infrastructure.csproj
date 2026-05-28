@@ -15,6 +15,14 @@
         <PackageReference Include="Microsoft.Extensions.Hosting" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- Phase 7 / Section B   Compile-time access to Microsoft.AspNetCore.Http types (IHttpContextAccessor + HttpContext) for HttpContextCorrelationContext.
+             This is the standard .NET 6+ way to use AspNetCore types from a non-web SDK project — the runtime is loaded by the Api project; this just imports the types.
+             The Infrastructure project remains Microsoft.NET.Sdk (not Web SDK) — no behavioral change. 
+          -->
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>

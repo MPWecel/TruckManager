@@ -143,6 +143,12 @@ try
     application.UseExceptionHandler();
     application.UseStatusCodePages();
 
+    // Phase 7 / Section B   Correlation middleware.
+    // Runs AFTER UseExceptionHandler so an exception thrown by a downstream middleware (auth, MVC, etc.) unwinds back through here on its way to UseExceptionHandler -
+    // — by which point HttpContext.Items["TruckManager.CorrelationId"] is set and GlobalExceptionHandler (Section F) can read it via ICorrelationContext.
+    // Runs BEFORE MapControllers / MapHealthChecks so the LogContext push wraps every actionable request.
+    application.UseMiddleware<CorrelationMiddleware>();
+
     application.UseAuthorization();
 
     application.MapControllers();

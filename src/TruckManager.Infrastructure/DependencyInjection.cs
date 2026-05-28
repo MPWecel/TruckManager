@@ -8,6 +8,7 @@ using TruckManager.Application.Abstractions.Persistence;
 using TruckManager.Common.Abstractions;
 using TruckManager.Domain.Policies;
 using TruckManager.Infrastructure.Auth;
+using TruckManager.Infrastructure.Http;
 using TruckManager.Infrastructure.Persistence;
 using TruckManager.Infrastructure.Persistence.Interceptors;
 using TruckManager.Infrastructure.Persistence.Serialization;
@@ -45,6 +46,13 @@ public static class DependencyInjection
 
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
         services.AddScoped<ICurrentUserService, StubCurrentUserService>();
+
+        // Phase 7 / Section B   Per-request CorrelationId source.
+        // AddHttpContextAccessor registers IHttpContextAccessor as a singleton (uses AsyncLocal under the hood, request-safe).
+        // HttpContextCorrelationContext is scoped — one instance per request — and reads HttpContext.Items[ItemKey], which CorrelationMiddleware sets at request entry.
+        // Throws if accessed outside an HTTP request scope or before the middleware ran.
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICorrelationContext, HttpContextCorrelationContext>();
 
         // ------------------------------------------------------------------------------
         // Domain-event serialization (ADR-0030)
